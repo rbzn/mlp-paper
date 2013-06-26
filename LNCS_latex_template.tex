@@ -1,0 +1,339 @@
+
+%%%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is the LaTeX source for the instructions to authors using
+% the LaTeX document class 'llncs.cls' for contributions to
+% the Lecture Notes in Computer Sciences series.
+% http://www.springer.com/lncs       Springer Heidelberg 2006/05/04
+%
+% It may be used as a template for your own input - copy it
+% to a new file with a new name and use it as the basis
+% for your article.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\documentclass[runningheads]{llncs}
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+\usepackage{tabularx}
+
+\usepackage{url}
+\urldef{\mailsa}\path |c.slawtschew@tu-berlin.de|
+\urldef{\mailsb}\path |c.slawtschew@tu-berlin.de|
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{The Title ...}
+
+% a short form should be given in case it is too long for the running head
+\titlerunning{Lecture Notes in Computer Science: Authors' Instructions}
+
+% the name(s) of the author(s) follow(s) next
+%
+% NB: Chinese authors should write their first names(s) in front of
+% their surnames. This ensures that the names appear correctly in
+% the running heads and the author index.
+%
+\author{Author}
+%
+\authorrunning{Author}   % abbreviated author list (for running head)
+%
+%%%% modified list of authors for the TOC (add the affiliations)
+\tocauthor{Author (Berlin Institute of Technology)}
+%
+\institute{Berlin Institute of Technology\\Chair of Systems Analysis and Computing\\Franklinstr. 28/29, 10587 Berlin, Germany\\
+\email{emailadress}\\ WWW home page:
+\texttt{http://www.sysedv.tu-berlin.de}}
+%
+% NB: a more complex sample for affiliations and the mapping to the
+% corresponding authors can be found in the file "llncs.dem"
+% (search for the string "\mainmatter" where a contribution starts).
+% "llncs.dem" accompanies the document class "llncs.cls".
+%
+
+\toctitle{Lecture Notes in Computer Science}
+\tocauthor{Authors' Instructions}
+\maketitle
+
+
+\begin{abstract} abstract abstract bla bla ...
+
+ \keywords{We would like to encourage you to list your keywords within
+the abstract section}
+\end{abstract}
+
+
+\section{Introduction}
+
+
+...
+
+
+\section{Related Work}
+There have been active studies related to the problem in both
+acdemia and industry…
+\\
+There are some studies, mostly from academia, done for …
+\\
+Some previous work envisioned the task of
+\\
+We believe that this is an interesting approach, in ist own right,
+but we do not discuss this approach further in this paper.
+
+
+\section{Section 3}
+
+
+
+\section{Section 4}
+
+
+
+\section{Concluding Remarks}
+...
+\\
+
+
+Please use the commands \verb+\label+ and \verb+\ref+ for
+cross-references and the commands \verb+\bibitem+ and \verb+\cite+ for
+references to the bibliography, to enable us to create hyperlinks at
+these places.
+
+For preparing your figures electronically and integrating them into
+your source file we recommend using the standard \LaTeX{} \verb+graphics+ or
+\verb+graphicx+ package. These provide the \verb+\includegraphics+ command.
+In general, please refrain from using the \verb+\special+ command.
+
+
+
+\subsubsection{Lemmas, Propositions, and Theorems.}
+
+The numbers accorded to lemmas, propositions, and theorems, etc. should
+appear in consecutive order, starting with Lemma 1, and not, for
+example, with Lemma 11.
+
+\subsection{Figures}
+
+For \LaTeX\ users, we recommend using the \emph{graphics} or \emph{graphicx}
+package and the \verb+\includegraphics+ command.
+
+Please check that the lines in line drawings are not
+interrupted and are of a constant width. Grids and details within the
+figures must be clearly legible and may not be written one on top of
+the other. Line drawings should have a resolution of at least 800 dpi
+(preferably 1200 dpi). The lettering in figures should have a height of
+2~mm (10-point type). Figures should be numbered and should have a
+caption which should always be positioned \emph{under} the figures, in
+contrast to the caption belonging to a table, which should always appear
+\emph{above} the table; this is simply achieved as matter of sequence in
+your source.
+
+Please center the figures or your tabular material by using the \verb+\centering+
+declaration. Short captions are centered by default between the margins
+and typeset in 9-point type (Fig.~\ref{fig:example} shows an example).
+The distance between text and figure is preset to be about 8~mm, the
+distance between figure and caption about 6~mm.
+
+To ensure that the reproduction of your illustrations is of a reasonable
+quality, we advise against the use of shading. The contrast should be as
+pronounced as possible.
+
+If screenshots are necessary, please make sure that you are happy with
+the print quality before you send the files.
+\begin{figure}
+\centering
+%\includegraphics[height=6.2cm]{eijkel2}
+\caption{One kernel at $x_s$ (\emph{dotted kernel}) or two kernels at
+$x_i$ and $x_j$ (\textit{left and right}) lead to the same summed estimate
+at $x_s$. This shows a figure consisting of different types of
+lines. Elements of the figure described in the caption should be set in
+italics, in parentheses, as shown in this sample caption}
+\label{fig:example}
+\end{figure}
+
+Please define figures (and tables) as floating objects. Please avoid
+using optional location parameters like ``\verb+[h]+" for ``here".
+
+\paragraph{Remark 1.}
+
+In the printed volumes, illustrations are generally black and white
+(halftones), and only in exceptional cases, and if the author is
+prepared to cover the extra cost for color reproduction, are colored
+pictures accepted. Colored pictures are welcome in the electronic
+version free of charge. If you send colored figures that are to be
+printed in black and white, please make sure that they really are
+legible in black and white. Some colors as well as the contrast of
+converted colors show up very poorly when printed in black and white.
+
+\subsection{Formulas}
+
+Displayed equations or formulas are centered and set on a separate
+line (with an extra line or halfline space above and below). Displayed
+expressions should be numbered for reference. The numbers should be
+consecutive within each section or within the contribution,
+with numbers enclosed in parentheses and set on the right margin --
+which is the default if you use the \emph{equation} environment, e.g.
+\begin{equation}
+  \psi (u) = \int_{o}^{T} \left[\frac{1}{2}
+  \left(\Lambda_{o}^{-1} u,u\right) + N^{\ast} (-u)\right] dt \;  .
+\end{equation}
+
+Please punctuate a displayed equation in the same way as ordinary
+text but with a small space before the end punctuation.
+
+\subsection{Footnotes}
+
+The superscript numeral used to refer to a footnote appears in the text
+either directly after the word to be discussed or -- in relation to a
+phrase or a sentence -- following the punctuation sign (comma,
+semicolon, or period). Footnotes should appear at the bottom of
+the normal text area, with a line of about 2~cm set
+immediately above them.\footnote{The footnote numeral is set flush left
+and the text follows with the usual word spacing.}
+
+\subsection{Program Code}
+
+Program listings or program commands in the text are normally set in
+typewriter font, e.g., CMTT10 or Courier.
+
+\medskip
+
+\noindent
+{\it Example of a Computer Program}
+\begin{verbatim}
+program Inflation (Output)
+  {Assuming annual inflation rates of 7%, 8%, and 10%,...
+   years};
+   const
+     MaxYears = 10;
+   var
+     Year: 0..MaxYears;
+     Factor1, Factor2, Factor3: Real;
+   begin
+     Year := 0;
+     Factor1 := 1.0; Factor2 := 1.0; Factor3 := 1.0;
+     WriteLn('Year  7% 8% 10%'); WriteLn;
+     repeat
+       Year := Year + 1;
+       Factor1 := Factor1 * 1.07;
+       Factor2 := Factor2 * 1.08;
+       Factor3 := Factor3 * 1.10;
+       WriteLn(Year:5,Factor1:7:3,Factor2:7:3,Factor3:7:3)
+     until Year = MaxYears
+end.
+\end{verbatim}
+%
+\noindent
+{\small (Example from Jensen K., Wirth N. (1991) Pascal user manual and
+report. Springer, New York)}
+
+\subsection{Citations}
+
+The list of references is headed ``References" and is not assigned a
+number. The list should be set in small print
+and placed at the end of your contribution, in front of the appendix,
+if one exists.
+Please do not insert a pagebreak before the list of references if the
+page is not completely filled.
+An example is given at the end of this information sheet. For citations in the text you can set square brackets and consecutive numbers: \cite{leeuw},
+\cite{bru:car:pier}, \cite{mich} \newline
+But you could also choose other bibliography-styles.
+If you are using bibtex for your bibliography, you can specify the style easily by using the command \verb+\bibliographystyle{}+ after your bibliography command at the end of the document. Between the brackets you specify the kind of style you prefer. In LaTex there are several styles possible ,for example \verb+apalike+, \verb+\plaindin+ or \verb+\dinat+.\newline
+For more details for right citation and citation-styles please see also the chair guidelines for scientific papers, available on the website: \newline \verb+http://www.sysedv.tu-berlin.de+\dots
+ 
+\subsection{Page Numbering and Running Heads}
+
+Please set page numbers by citing within the text. For example, after a written section\cite[p. 5.]{leeuw}
+
+\section{LNCS Online}
+
+The online version of the volume will be available in LNCS Online.
+Members of institutes subscribing to the Lecture Notes in Computer
+Science series have access to all the pdfs of all the online
+publications. Non-subscribers can only read as far as the abstracts. If
+they try to go beyond this point, they are automatically asked, whether
+they would like to order the pdf, and are given instructions as to how
+to do so.
+
+\section{BibTeX Entries}
+
+The correct BibTeX entries for the Lecture Notes in Computer Science
+volumes can be found at the following Website shortly after the
+publication of the book:
+\url{http://www.informatik.uni-trier.de/~ley/db/journals/lncs.html}
+
+\section{Lecture Notes in Computer Science in the ISI SCI Expanded}
+
+The Lecture Notes in Computer Science volumes are sent to ISI for
+inclusion in their Science Citation Index Expanded.
+
+\subsubsection*{Acknowledgments.} The heading should be treated as a
+subsubsection heading and should not be assigned a number.
+
+
+\begin{thebibliography}{4}
+%
+
+%
+\bibitem{leeuw}
+van Leeuwen, J. (ed.):
+Computer Science Today. Recent Trends and Developments.
+Lecture Notes in Computer Science, Vol.~1000.
+Springer-Verlag, Berlin Heidelberg New York (1995)
+%
+\bibitem{bru:car:pier}
+Bruce, K.B., Cardelli, L., Pierce, B.C.:
+Comparing Object Encodings.
+In: Abadi,~M., Ito,~T. (eds.):
+Theoretical Aspects of Computer Software.
+Lecture Notes in Computer Science, Vol.~1281.
+Springer-Verlag, Berlin Heidelberg New York (1997) 415--438
+%
+\bibitem{mich}
+Michalewicz, Z.:
+Genetic Algorithms + Data Structures = Evolution Programs.
+3rd edn. Springer-Verlag, Berlin Heidelberg New York (1996)
+%
+\bibitem{bal:cha:gra:pae}
+Baldonado, M., Chang, C.-C.K., Gravano, L., Paepcke, A.:
+The Stanford Digital Library Metadata Architecture.
+Int. J. Digit. Libr. \textbf{1} (1997) 108--121
+%
+\end{thebibliography}
+
+\section*{Appendix: Springer-Author Discount}
+
+LNCS authors are entitled to a 33.3\% discount off all Springer
+publications. Before placing an order, the author should send an email
+to \texttt{SDC.bookorder@springer.com}, giving full
+details of his or her
+Springer publication, to obtain a so-called token. This token is a
+number, which must be entered when placing an order via the Internet, in
+order to obtain the discount.
+
+\section{Checklist of Items to be Sent to Volume Editors}
+Here is a checklist of everything the volume editor requires from you:
+
+
+\begin{itemize}
+\settowidth{\leftmargin}{{\Large$\square$}}\advance\leftmargin\labelsep
+\itemsep8pt\relax
+\renewcommand\labelitemi{{\lower1.5pt\hbox{\Large$\square$}}}
+
+\item The final \LaTeX{} source files
+\item A final PDF file
+\item A copyright form, signed by one author on behalf of all the
+authors of the paper.
+\item A readme giving the first name(s) and the surname(s) of all the
+authors of the paper, as well as the name and address of the
+corresponding author.
+\end{itemize}
+\end{document}
