@@ -18,7 +18,7 @@
 
 \usepackage{url}
 \urldef{\mailsa}\path|rob@clabs.cc, schubotz@tu-berlin.de|
-\newcommand{\todaydate}{\leadingzero{\day}.\leadingzero{\month}.\the\year} 
+\newcommand{\todaydate}{\leadingzero{\day}.\leadingzero{\month}.\the\year}
 \newcommand{\keywords}[1]{\par\addvspace\baselineskip
 \noindent\keywordname\enspace\ignorespaces#1}
 
@@ -42,52 +42,96 @@ Einsteinufer 17, 10587 Berlin, Germany\\
 
 
 \begin{abstract}
-In this paper, we present a solution for automated definition discovery for the variables occurring in mathematical formulae.
-Ordinary natural language processing approaches that are trained based on large, manually annotated news corpora fall short in reasonable quality of definition discovery for scientific texts.
-In the \emph{Mathematical Language Processing} project, we discover definitions %we did not discover any relations
-% a relation would be something like "let <subj> be a <object>", or "we call <subj> <obj>", or "<subject> is <object>" or just "<subj> <obj>"
- for identifiers in formulae from the surrounding text by statistical methods.
- %with a machine learning approach for classification. This was also not done in this paper
-%We extract the identifiers from the formulae and track co-occurrences of those in the surrounding text.
-The evaluation of our prototypical system, applied on the Wikipedia text corpus shows that our approach augments the user experience for articles with mathematical formula substantially.
-While hovering the identifiers occurring in the equation a pop-up with the most probable explanations for the identifiers occurs. The displayed definition information provides a good match to the actual meaning of the identifiers.
+In this paper, we present a solution for automated definition discovery for
+the variables occurring in mathematical formulae. Ordinary natural language
+processing approaches that are trained based on large, manually annotated news
+corpora fall short in reasonable quality of definition discovery for
+scientific texts. In the \emph{Mathematical Language Processing} project, we
+discover definitions
+%we did not discover any relations  a relation would be something like "let
+%<subj> be a <object>", or "we call <subj> <obj>", or "<subject> is <object>"
+%or just "<subj> <obj>"
+for identifiers in formulae from the surrounding text by statistical methods.
+%with a machine learning approach for classification. This was also not done
+%in this paper We extract the identifiers from the formulae and track co-
+%occurrences of those in the surrounding text.
+The evaluation of our prototypical system, applied on the Wikipedia text
+corpus shows that our approach augments the user experience for articles with
+mathematical formula substantially. While hovering the identifiers occurring
+in the equation a pop-up with the most probable explanations for the
+identifiers occurs. The displayed definition information provides a good match
+to the actual meaning of the identifiers.
 \keywords{machine learning, text mining, parallel computing}
 \end{abstract}
- 
+
 
 \section{Introduction}
 
-
 \subsection{Motivation}
-Mathematical formulae are a viable source of information for a wide range of scientists. Often those formulas contain variables that are unknown or at least ambiguous to the reader. Therefore, one needs to study the surrounding text to find the relevant definition.
+Mathematical formulae are a viable source of information for a wide range of
+scientists. Often those formulas contain variables that are unknown or at
+least ambiguous to the reader. Therefore, one needs to study the surrounding
+text to find the relevant definition.
 
-An automatic information retrieval system can be used to reduce the readers effort to understand a formula. Especially students and scientists of other disciplines would profit from such a system.
+An automatic information retrieval system can be used to reduce the readers
+effort to understand a formula. Especially students and scientists of other
+disciplines would profit from such a system.
 
-Unfortunately, no one has built a labeled text corpus that annotates variables and their definition. Instead of labeling large amounts of text by hand, we investigate a potential way of automatically labeling large corpora with a set of statistical assumptions.
+Unfortunately, no one has built a labeled text corpus that annotates variables
+and their definition. Instead of labeling large amounts of text by hand, we
+investigate a potential way of automatically labeling large corpora with a set
+of statistical assumptions.
 
-We chose the Wikipedia text corpus as a target because of two facts. First, the mark-up for editing formulas is essentially a subset of \TeX. Therefore, it enables us to collect all variables within the set of formulas in a document. Second, we can leverage the semantic information between mark-up and word tokens, e.g., hyperlinks.
+We chose the Wikipedia text corpus as a target because of two facts. First,
+the mark-up for editing formulas is essentially a subset of \TeX. Therefore,
+it enables us to collect all variables within the set of formulas in a
+document. Second, we can leverage the semantic information between mark-up and
+word tokens, e.g., hyperlinks.
 
-The English Wikipedia contains roughly four million articles. Even if we only pick articles containing \texttt{<math/>} mark-up, our processor still needs to compute tens of thousands of articles. Especially when using a maximum entropy \emph{POS} tagger \cite{Rathna96}, like the one in Stanford's NLP framework, one can make use of a parallel processing system to speed up computation.
+The English Wikipedia contains roughly four million articles. Even if we only
+pick articles containing \texttt{<math/>} mark-up, our processor still needs
+to compute tens of thousands of articles. Especially when using a maximum
+entropy \emph{POS} tagger \cite{Rathna96}, like the one in Stanford's NLP
+framework, one can make use of a parallel processing system to speed up
+computation.
 
-We will show how the proposed strategy can be implemented in the PACT programming model \cite{Alexandrov2010}.
+We will show how the proposed strategy can be implemented in the PACT
+programming model \cite{Alexandrov2010}.
 
 
 \subsection{Related Work}
-\citeauthor{Quoc2010} (2010) proposed in \cite{Quoc2010} an approach for relating whole formulas to sentences and their describing paragraphs. \citeauthor{Yokoi} (2010) trained a \emph{support vector machine} to extract natural language descriptions for mathematical expressions \cite{Yokoi}.
+\citeauthor{Quoc2010} (2010) proposed in cite{Quoc2010} an approach for
+relating whole formulas to sentences and their describing paragraphs.
+\citeauthor{Yokoi} (2010) trained a emph{support vector machine} to extract
+natural language descriptions for mathematical expressions cite{Yokoi}.
 
 
 \section{Relation Detection}
-The basic assumption of our approach is that if two entities take part in a relation, those two co-occur in the same sentence. This assumption is also used in the \emph{Distant Supervision} \cite{Mintz2008} approach by \citeauthor{Mintz2008}. Furthermore, we assume in a scientific document, which contains a specific variable name, there is at least one sentence with such a relation.
+The basic assumption of our approach is that if two entities take part in a
+relation, those two co-occur in the same sentence. This assumption is also
+used in the \emph{Distant Supervision} \cite{Mintz2008} approach by
+\citeauthor{Mintz2008}. Furthermore, we assume in a scientific document, which
+contains a specific variable name, there is at least one sentence with such a
+relation.
 
-The two entities have some characteristics that can be used for filtering. First of all, the relevant variables can be retrieved accurately from \TeX\ formatted formulas (see Section \ref{vr}). The fact that a relation consists of two entities and we know that one must be the variable, leads to an obvious conclusion: Sentences without a variable cannot contain a definition relation and can be discarded.
-Second, one can assume that the other entity must be a noun or a compound noun. Thus, all words that are not nouns or adjectives describing these nouns, can also be discarded.
+The two entities have some characteristics that can be used for filtering.
+First of all, the relevant variables can be reieved accurately from \TeX\
+formatted formulas (see Section \ref{vr}). The fact that a relation consists
+of two entities and we know that one must be the variable, leads to an obvious
+conclusion: Sentences without a variable cannot contain a definition relation
+and can be discarded. Second, one can assume that the other entity must be a
+noun or a compound noun. Thus, all words that are not nouns or adjectives
+describing these nouns, can also be discarded.
 
 
 \subsection{Numerical Statistics}
-As a prerequisite for detecting potential relations, one needs to identify all occurrences of a variable within a document.
-We assume that the distance between the identifier and the corresponding definition is normal distributed.
+As a prerequisite for detecting potential relations, one needs to identify all
+occurrences of a variable within a document. We assume that the distance
+between the identifier and the corresponding definition is normal distributed.
 
-Formally, we calculate the distance in words $\Delta=p_\mathrm{def}-p_\mathrm{id}$  between $p_\mathrm{def}$ the position of the definition and $p_\mathrm{id}$ the position of the identifier.
+Formally, we calculate the distance in words
+$\Delta=p_\mathrm{def}-p_\mathrm{id}$  between $p_\mathrm{def}$ the position
+of the definition and $p_\mathrm{id}$ the position of the identifier.
 
 Thus, the assumed normalized relation probability density function reads
 \begin{equation}
@@ -97,18 +141,32 @@ R_\sigma(\Delta)= {\sigma \sqrt{2\pi}}{e^{{\left(2\sigma^2\right)^{-1}}}} \mathc
 \newcommand{\normalPlot}[2]{(e^((-1/2)*(((#1)^2-1)/(#2)^2)))} %1/((#2)*sqrt(2*pi)))*
 \newcommand{\normalPlotFWHM}[2]{\normalPlot{#1}{ sqrt(((#2)^2-1)/(2*ln(2)))}}
 
-Thereby we performed the normalization, with regard to the model assumption that the probability to find a relation at $\Delta=1$ is maximal, i.e. $R(1)=1$. 
-Manual evaluation of some articles indicated that $R(1)\approx\frac{1}{2}R(5)$.
-As, the full width half maximum is at $\Delta=\sqrt{2 \ln(2)  \sigma^2+1}$, and the standard deviation evaluates to $\sigma(\Delta)=\sqrt\frac{\Delta^2-1}{2\ln 2}$. As a consequence we choose $\sigma_d=\sqrt\frac{5^2-1}{2\ln 2}$ and write $R_\mathrm{d}(\Delta) \equiv R_{\sigma_\mathrm{d}}(\Delta) $. Please note that this assumption is heavily influenced by the language of the text corpus. 
+Thereby we performed the normalization, with regard to the model assumption
+that the probability to find a relation at $\Delta=1$ is maximal, i.e.
+$R(1)=1$.  Manual evaluation of some articles indicated that
+$R(1)\approx\frac{1}{2}R(5)$. As, the full width half maximum is at
+$\Delta=\sqrt{2 \ln(2)  \sigma^2+1}$, and the standard deviation evaluates to
+$\sigma(\Delta)=\sqrt\frac{\Delta^2-1}{2\ln 2}$. As a consequence we choose
+$\sigma_d=\sqrt\frac{5^2-1}{2\ln 2}$ and write $R_\mathrm{d}(\Delta) \equiv
+R_{\sigma_\mathrm{d}}(\Delta) $. Please note that this assumption is heavily
+influenced by the language of the text corpus.
 
-Not only the distances within one sentence are of interest. Also the sequential order of sentences, containing a variable, carry some viable sources for statistics. Typically an author first introduces a term and uses it in subsequent sentences without necessarily repeating its definition. We assume that this kind of behavior also applies to the use of variables. Thus, we extend the idea of distance to the sequential order of sentences. Here, the distance is the count $n$ of candidate sentences, beginning at the top of the document.
+Not only the distances within one sentence are of interest. Also the
+sequential order of sentences, containing a variable, carry some viable
+sources for statistics. Typically an author first introduces a term and uses
+it in subsequent sentences without necessarily repeating its definition. We
+assume that this kind of behavior also applies to the use of variables. Thus,
+we extend the idea of distance to the sequential order of sentences. Here, the
+distance is the count $n$ of candidate sentences, beginning at the top of the
+document.
 
-In our experiments, we expect that half of the definition relations are found in the sentence with 3 sentences difference. Thus we choose 
+In our experiments, we expect that half of the definition relations are found
+in the sentence with 3 sentences difference. Thus we choose
 \begin{equation}
 \label{eq:order}
 R_{s}(n)={\sigma_\mathrm{s} \sqrt{2\pi}} \mathcal N(0,\sigma_\mathrm{s}^2)(n)= \exp\left[-\frac{1}{2}\frac{n^2}{\sigma_\mathrm{s}^2}\right]
 \end{equation}
- with $\sigma_\mathrm{s}=\frac{3}{\sqrt{2\ln 2}}$. 
+ with $\sigma_\mathrm{s}=\frac{3}{\sqrt{2\ln 2}}$.
 \newcommand{\normalPlotFWHMII}[2]{(e^((-1/2)*(((#1)^2*2*ln(2))/(#2)^2)))}
 
 \begin{figure}[H]
@@ -140,16 +198,25 @@ R_{s}(n)={\sigma_\mathrm{s} \sqrt{2\pi}} \mathcal N(0,\sigma_\mathrm{s}^2)(n)= \
 \caption{Curves of the rating functions $R_{d}$ and $R_{s}$}
 \end{figure}
 
-Furthermore, we take distributional properties into account. The classic tf-idf \cite{Salton86} statistic reflects the importance of a term to a document. Unfortunately, the \emph{inverse document frequency} is not applicable to definition relations. The frequency distribution of all terms, that participate in various relations is unknown. Thus, using tf-idf could affect the sensitivity of our rating statistic significantly. E.g., `Hamiltonian' as well as `length' are both valid entities. Obviously, the number of documents containing one of these words, within a corpus like Wikipedia, differs a lot.
+Furthermore, we take distributional properties into account. The classic tf-
+idf \cite{Salton86} statistic reflects the importance of a term to a document.
+Unfortunately, the \emph{inverse document frequency} is not applicable to
+definition relations. The frequency distribution of all terms, that
+participate in various relations is unknown. Thus, using tf-idf could affect
+the sensitivity of our rating statistic significantly. E.g., `Hamiltonian' as
+well as `length' are both valid entities. Obviously, the number of documents
+containing one of these words, within a corpus like Wikipedia, differs a lot.
 
-Therefore, we only use the normalized term frequency. $t$ and $w$ are terms. $f(t,d)$ denotes the frequency of a term within a document $d$.
+Therefore, we only use the normalized term frequency. $t$ and $w$ are terms.
+$f(t,d)$ denotes the frequency of a term within a document $d$.
 
 \begin{equation}
 	\label{eq:tf}
 	\mathrm{tf}(t,d) = \frac{\mathrm{f}(t,d)}{\max\{\mathrm{f}(w,d):w \in d\}}
 \end{equation}
 
-We define our ranking statistic as the normalized weighted mean of the rankings defined in Equations \ref{eq:dist}, \ref{eq:order}, and \ref{eq:tf}:
+We define our ranking statistic as the normalized weighted mean of the
+rankings defined in Equations \ref{eq:dist}, \ref{eq:order}, and \ref{eq:tf}:
 
 \begin{equation}
 	\label{eq:rating}
@@ -160,7 +227,13 @@ We define our ranking statistic as the normalized weighted mean of the rankings 
 \section{Implementation}
 
 \subsection{Overview of the processor}
-The MLP processing system \cite{github} is basically a set of PACTs, where data flows through. In contrast to other programming models like Map/Reduce, PACTs can operate on multiple inputs. At some point of time, one needs an ordered list of tokenized sentences and a list of identified variables, to compute the ranking score. A \emph{CoGroup Contract} takes both lists and computes the subsets, build upon distinct document keys. Finally, a \emph{Reduce Contract} filters out results below a given threshold $\theta$.
+The MLP processing system \cite{github} is basically a set of PACTs, where
+data flows through. In contrast to other programming models like Map/Reduce,
+PACTs can operate on multiple inputs. At some point of time, one needs an
+ordered list of tokenized sentences and a list of identified variables, to
+compute the ranking score. A \emph{CoGroup Contract} takes both lists and
+computes the subsets, build upon distinct document keys. Finally, a
+\emph{Reduce Contract} filters out results below a given threshold $\theta$.
 
 \tikzset{actor/.style={
         rectangle,
@@ -191,39 +264,83 @@ The MLP processing system \cite{github} is basically a set of PACTs, where data 
 	\end{tikzpicture}
 \caption{Data flow of the PACT program}
 \end{figure}
-There are three computation heavy parts in the processor. First, the raw Wikipedia document dumps need to be transformed into plain text. At the same step, the formulas need to be evaluated and replaced by place-holder words. We used the \emph{WikiText} framework of the Mylyn project with a custom builder to transform the document into plain text. For analysing the \TeX \ mark-up in the \texttt{<math/>} tags, \emph{SnuggleTeX} transforms the formulas into their MathML representations, where variable names can be easily extracted.
 
-The second computation heavy part is tokenization and tagging of the plain text documents. We used the Stanford maximum entropy tagger with the \emph{WSJ left3words} language model.
+There are three computation heavy parts in the processor. First, the raw
+Wikipedia document dumps need to be transformed into plain text. At the same
+step, the formulas need to be evaluated and replaced by place-holder words. We
+used the \emph{WikiText} framework of the Mylyn project with a custom builder
+to transform the document into plain text. For analysing the \TeX \ mark-up in
+the \texttt{<math/>} tags, \emph{SnuggleTeX} transforms the formulas into
+their MathML representations, where variable names can be easily extracted.
 
-Finally, the rating for all nouns, contained in all candidate sentences, needs to be calculated.
+The second computation heavy part is tokenization and tagging of the plain
+text documents. We used the Stanford maximum entropy tagger with the \emph{WSJ
+left3words} language model.
+
+Finally, the rating for all nouns, contained in all candidate sentences, needs
+to be calculated.
 
 
 \subsection{Experiments}
 
 \subsubsection{Variable Retrieval}
 \label{vr}
-Throughout our experiments we made some observations that had an impact on the accuracy of retrieving the correct set of variables. First of all, people tend to incorrectly use \TeX\ trying to create formulas. E.g., \texttt{\textbackslash text\{log\}} is more often used than the correct operator \texttt{\textbackslash log}. Another problem is that sometimes people use indices as a form of annotation, like $T_{before}$, $R_{A}$, and $R_{B}$. These ambiguities lead to a increased number of false positives.
+Throughout our experiments we made some observations that had an impact on the
+accuracy of retrieving the correct set of variables. First of all, people tend
+to incorrectly use \TeX\ trying to create formulas. E.g.,
+\texttt{\textbackslash text\{log\}} is more often used than the correct
+operator \texttt{\textbackslash log}. Another problem is that sometimes people
+use indices as a form of annotation, like $T_{before}$, $R_{A}$, and $R_{B}$.
+These ambiguities lead to a increased number of false positives.
 
-We took a very conservative approach and preprocessed all formulas. \texttt{\textbackslash text\{\}} blocks along with plain subscriptions will be removed before analysis. Moreover, we created a comprehensive blacklist to improve the results further. Short words like `a' and `i', which are very common, could be easily matched by our processor if a formula contains one of those symbols. Additionally, we blacklist common mathematical operators, constants, and functions.
+We took a very conservative approach and preprocessed all formulas.
+\texttt{\textbackslash text\{\}} blocks along with plain subscriptions will be
+removed before analysis. Moreover, we created a comprehensive blacklist to
+improve the results further. Short words like `a' and `i', which are very
+common, could be easily matched by our processor if a formula contains one of
+those symbols. Additionally, we blacklist common mathematical operators,
+constants, and functions.
 
-Because of the fact, that we do not have any annotated test corpora, evaluation has to be performed by hand. Therefore, we took a sample of 30 random documents and counted all matches. The resulting estimates for \emph{recall} and \emph{precision} are 0.99 and 0.86 respectively.
-
+Because of the fact, that we do not have any annotated test corpora,
+evaluation has to be performed by hand. Therefore, we took a sample of 30
+random documents and counted all matches. The resulting estimates for
+\emph{recall} and \emph{precision} are 0.99 and 0.86 respectively.
 
 
 \subsubsection{Tuning}
-The weighting parameters $\alpha$, $\beta$, and $\gamma$ in Equation \ref{eq:rating} are used to balance the contribution of all embedded statistics to the overall ranking. But these parameters need to be tuned carefully. Otherwise the results tend to be biased towards one parameter. In other words, if the distance measure $R_{D}$ dominates the other measures, more complex\footnote{in terms of words between both entities, participating in a relation} relations are less likely to be discovered.
+The weighting parameters $\alpha$, $\beta$, and $\gamma$ in Equation
+\ref{eq:rating} are used to balance the contribution of all embedded
+statistics to the overall ranking. But these parameters need to be tuned
+carefully. Otherwise the results tend to be biased towards one parameter. In
+other words, if the distance measure $R_{D}$ dominates the other measures,
+more complex\footnote{in terms of words between both entities, participating
+in a relation} relations are less likely to be discovered.
 
-The \emph{term frequency} turns out to be the least robust statistic. Usually, the frequency of a specific term co-occurring with a variable name within one document is rather low. Thus, the derived ranking is relatively volatile. In our experiments, we chose $\gamma$ to be 0.75 ($\alpha = \beta = 1$) for a more robust ranking.
-
+The \emph{term frequency} turns out to be the least robust statistic. Usually,
+the frequency of a specific term co-occurring with a variable name within one
+document is rather low. Thus, the derived ranking is relatively volatile. In
+our experiments, we chose $\gamma$ to be 0.75 ($\alpha = \beta = 1$) for a
+more robust ranking.
 
 \section{Conclusion}
-Our experiments showed that combining a POS tagger with numerical statistics about the text surface, can lead to quality results. However, this approach is only applicable under certain conditions. In situations where both parts of a relation are unknown, other methods, especially supervised ones, are used to bootstrap a language model. Unfortunately, we still need a labelled test corpus to measure the performance of a classifier, trained with our generated data.
+Our experiments showed that combining a POS tagger with numerical statistics
+about the text surface, can lead to quality results. However, this approach is
+only applicable under certain conditions. In situations where both parts of a
+relation are unknown, other methods, especially supervised ones, are used to
+bootstrap a language model. Unfortunately, we still need a labelled test
+corpus to measure the performance of a classifier, trained with our generated
+data.
 
+Apart from the mentioned weighting parameters, the ranking's quality is
+influenced by two further parameters. These are the assumptions about the
+parameter $c$. Balancing all these parameters requires extensive knowledge
+about the underlying language. These parameters might be specific for every
+type of relation. Therefore, this strategy depends heavily on human input and
+many iterations of tuning.
 
-Apart from the mentioned weighting parameters, the ranking's quality is influenced by two further parameters. These are the assumptions about the parameter $c$. Balancing all these parameters requires extensive knowledge about the underlying language. These parameters might be specific for every type of relation. Therefore, this strategy depends heavily on human input and many iterations of tuning.
-
-To further improve the robustness of the \emph{term frequency} measure, one might cluster sets of scientific documents, based on their specific field of research.
-
+To further improve the robustness of the \emph{term frequency} measure, one
+might cluster sets of scientific documents, based on their specific field of
+research.
 
 
 
