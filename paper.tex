@@ -42,10 +42,10 @@ Einsteinufer 17, 10587 Berlin, Germany\\
 
 
 \begin{abstract}
-In this paper, we present a solution for automated definition discovery for
-the variables occurring in mathematical formulae. Ordinary natural language
-processing approaches that are trained based on large, manually annotated news
-corpora fall short in reasonable quality of definition discovery for
+This paper presents automated definition discovery for
+variables occurring in mathematical formulae. Ordinary natural language
+processing approaches are trained based on large, manually annotated news
+corpora. They fall short in reasonable quality of definition discovery for
 scientific texts. In the \emph{Mathematical Language Processing} project, we
 discover definitions
 %we did not discover any relations  a relation would be something like "let
@@ -67,7 +67,6 @@ to the actual meaning of the identifiers.
 
 \section{Introduction}
 
-\subsection{Motivation}
 Mathematical formulae are a viable source of information for a wide range of
 scientists. Often those formulas contain variables that are unknown or at
 least ambiguous to the reader. Therefore, one needs to study the surrounding
@@ -95,138 +94,67 @@ entropy \emph{POS} tagger \cite{Rathna96}, like the one in Stanford's NLP
 framework, one can make use of a parallel processing system to speed up
 computation.
 
-We will show how the proposed strategy can be implemented in the PACT
+We implement  show how the proposed strategy can be implemented in the PACT
 programming model \cite{Alexandrov2010}.
 
 
-\subsection{Related Work}
-\citeauthor{Quoc2010} (2010) proposed in cite{Quoc2010} an approach for
+\paragraph{Related Work}
+\citeauthor{Quoc2010}\cite{Quoc2010} proposed an approach for
 relating whole formulas to sentences and their describing paragraphs.
-\citeauthor{Yokoi} (2010) trained a emph{support vector machine} to extract
-natural language descriptions for mathematical expressions cite{Yokoi}.
+\citeauthor{Yokoi}\cite{Yokoi} trained a emph{support vector machine} to extract
+natural language descriptions for mathematical expressions.
 
 
-\section{Relation Detection}
-The basic assumption of our approach is that if two entities take part in a
-relation, those two co-occur in the same sentence. This assumption is also
-used in the \emph{Distant Supervision} \cite{Mintz2008} approach by
-\citeauthor{Mintz2008}. Furthermore, we assume in a scientific document, which
-contains a specific variable name, there is at least one sentence with such a
-relation.
+\section{Statistical definition discovery}
+We detect relations between identifiers and their description in two steps.
+First, we extract the identifiers from the display-style formulae and
+second we determine their description from the surrounding text.
 
-The two entities have some characteristics that can be used for filtering.
-First of all, the relevant variables can be reieved accurately from \TeX\
-formatted formulas (see Section \ref{vr}). The fact that a relation consists
-of two entities and we know that one must be the variable, leads to an obvious
-conclusion: Sentences without a variable cannot contain a definition relation
-and can be discarded. Second, one can assume that the other entity must be a
-noun or a compound noun. Thus, all words that are not nouns or adjectives
-describing these nouns, can also be discarded.
+Inspired by the \emph{Distant Supervision} approach \cite{Mintz2008},
+we assume that the identifier and the definition co-occur in the same sentence.
+Furthermore, we restrict ourselves to identifiers that co-occur with a noun
+phrase in one sentence in the document at least.
 
-
-\subsection{Numerical Statistics}
-As a prerequisite for detecting potential relations, one needs to identify all
-occurrences of a variable within a document. We assume that the distance
-between the identifier and the corresponding definition is normal distributed.
-
-Formally, we calculate the distance in words
-$\Delta=p_\mathrm{def}-p_\mathrm{id}$  between $p_\mathrm{def}$ the position
-of the definition and $p_\mathrm{id}$ the position of the identifier.
-
-Thus, the assumed normalized relation probability density function reads
-\begin{equation}
-\label{eq:dist}
-R_\sigma(\Delta)= {\sigma \sqrt{2\pi}}{e^{{\left(2\sigma^2\right)^{-1}}}} \mathcal N(0,\sigma^2)(\Delta)\equiv \exp\left[-\frac{1}{2}\frac{\Delta^2-1}{\sigma^2}\right].
+For each description candidate we use the weighted sum
+\begin{equation} \label{eq:rating}
+	R(n,\Delta,t,d)=\frac{\alpha{R}_{\sigma_\mathrm d}(\Delta)
+		+\beta{R}_{\sigma_\mathrm s}(n)
+		+\gamma\mathrm{tf}(t,d)}{\alpha+\beta+\gamma} \mapsto [0;1]
 \end{equation}
-\newcommand{\normalPlot}[2]{(e^((-1/2)*(((#1)^2-1)/(#2)^2)))} %1/((#2)*sqrt(2*pi)))*
-\newcommand{\normalPlotFWHM}[2]{\normalPlot{#1}{ sqrt(((#2)^2-1)/(2*ln(2)))}}
+that respects the distance $\Delta$ between identifier and definition term $t$, the distance $n$ between the display-style equation and th sentence that contains the term and the identifier and the term frequency $\mathrm{tf}(t,d)$ in the current document $d$ 
+with a normal distributed distance measure $R_\sigma(\Delta)= \exp\left[-\frac{1}{2}\frac{\Delta^2-1}{\sigma^2}\right].$
+Our model assumption is that the probability to find a relation at $\Delta=1$ like for example in \emph{the energy $E$ and the mass $m$} is maximal, i.e. $R_{\sigma_\mathrm d}(1)=1$.  In order to determine the full width half maximum of our distribution we evaluated some articles manually and found $R_{\sigma_\mathrm d}(1)\approx 2 R_{\sigma_\mathrm d}(5)$ and thus $\sigma_d=\sqrt\frac{5^2-1}{2\ln 2}$.
 
-Thereby we performed the normalization, with regard to the model assumption
-that the probability to find a relation at $\Delta=1$ is maximal, i.e.
-$R(1)=1$.  Manual evaluation of some articles indicated that
-$R(1)\approx\frac{1}{2}R(5)$. As, the full width half maximum is at
-$\Delta=\sqrt{2 \ln(2)  \sigma^2+1}$, and the standard deviation evaluates to
-$\sigma(\Delta)=\sqrt\frac{\Delta^2-1}{2\ln 2}$. As a consequence we choose
-$\sigma_d=\sqrt\frac{5^2-1}{2\ln 2}$ and write $R_\mathrm{d}(\Delta) \equiv
-R_{\sigma_\mathrm{d}}(\Delta) $. Please note that this assumption is heavily
-influenced by the language of the text corpus.
+The probability to find a correct definition decays for 50 \% within three sentences. Consequently  $\sigma_\mathrm s=2\left({\ln 2}\right)^{-\frac{1}{2}}$.
 
-Not only the distances within one sentence are of interest. Also the
-sequential order of sentences, containing a variable, carry some viable
-sources for statistics. Typically an author first introduces a term and uses
-it in subsequent sentences without necessarily repeating its definition. We
-assume that this kind of behavior also applies to the use of variables. Thus,
-we extend the idea of distance to the sequential order of sentences. Here, the
-distance is the count $n$ of candidate sentences, beginning at the top of the
-document.
+The classic tf-idf \cite{Salton86} statistic reflects the importance of a term to a document. For our task the inverse document frequency (idf)  would assign high penalties to frequent which are valid definitions for identifiers like in the example `Energy` and `Einstein`. Consequently we used just the term frequency which still had an impact on the overall result that seemed to high in our manual experiments. Therefore, we use the tuning parameters $\gamma=0.75$ and $\alpha = \beta = 1$.
 
-In our experiments, we expect that half of the definition relations are found
-in the sentence with 3 sentences difference. Thus we choose
-\begin{equation}
-\label{eq:order}
-R_{s}(n)={\sigma_\mathrm{s} \sqrt{2\pi}} \mathcal N(0,\sigma_\mathrm{s}^2)(n)= \exp\left[-\frac{1}{2}\frac{n^2}{\sigma_\mathrm{s}^2}\right]
-\end{equation}
- with $\sigma_\mathrm{s}=\frac{3}{\sqrt{2\ln 2}}$.
-\newcommand{\normalPlotFWHMII}[2]{(e^((-1/2)*(((#1)^2*2*ln(2))/(#2)^2)))}
 
-\begin{figure}[H]
-\begin{tikzpicture}
-	\begin{axis}[
-			axis x line = bottom,
-			axis y line = left,
-			height=3.5cm, width=12cm,
-			xmin=-10, xmax=10,
-			ymin=0, ymax=1,
-			xtick={-5,-3,0,3,5},
-			ytick={0,0.5,1},
-			xlabel=$Distance$,
-			ylabel=$Ranking$,
-			domain={-21:21},
-			samples at={-10,-9,...,-1,1,2,...,10}
-			]
-		\addplot [mark=x,smooth]{\normalPlotFWHM{x}{5}};
-		\addplot [mark=x,smooth,samples at={-10,-9,...,10}]{\normalPlotFWHMII{x}{3}};
-		\addplot [black,dotted] coordinates {(0,0) (0,1)};
-		\addplot [black,dashed] coordinates {(5,0) (5,1)};
-		\addplot [black,dashed] coordinates {(3,0) (3,1)};
-		\addplot [black,dashed] coordinates {(-5,0) (-5,1)};
-		\addplot [black,dashed] coordinates {(-3,0) (-3,1)};
-	\end{axis}
-\end{tikzpicture}
-%		\addplot [mark=,domain=-20:20,smooth]{e^(-(x^2/13.5))};
-%			x dir=reverse,
-\caption{Curves of the rating functions $R_{d}$ and $R_{s}$}
-\end{figure}
-
-Furthermore, we take distributional properties into account. The classic tf-
-idf \cite{Salton86} statistic reflects the importance of a term to a document.
-Unfortunately, the \emph{inverse document frequency} is not applicable to
-definition relations. The frequency distribution of all terms, that
-participate in various relations is unknown. Thus, using tf-idf could affect
-the sensitivity of our rating statistic significantly. E.g., `Hamiltonian' as
-well as `length' are both valid entities. Obviously, the number of documents
-containing one of these words, within a corpus like Wikipedia, differs a lot.
-
-Therefore, we only use the normalized term frequency. $t$ and $w$ are terms.
-$f(t,d)$ denotes the frequency of a term within a document $d$.
-
-\begin{equation}
-	\label{eq:tf}
-	\mathrm{tf}(t,d) = \frac{\mathrm{f}(t,d)}{\max\{\mathrm{f}(w,d):w \in d\}}
-\end{equation}
-
-We define our ranking statistic as the normalized weighted mean of the
-rankings defined in Equations \ref{eq:dist}, \ref{eq:order}, and \ref{eq:tf}:
-
-\begin{equation}
-	\label{eq:rating}
-	R(n,\Delta,t,d)=\frac{\alpha{R}_{\mathrm d}(\Delta)+\beta{R}_{\mathrm s}(n)+\gamma\mathrm{tf}(t,d)}{\alpha+\beta+\gamma} \mapsto [0;1]
-\end{equation}
-
+%The weighting parameters $\alpha$, $\beta$, and $\gamma$ in Equation
+%\ref{eq:rating} are used to balance the contribution of all embedded
+%statistics to the overall ranking. But these parameters need to be tuned
+%carefully. Otherwise the results tend to be biased towards one parameter. In
+%other words, if the distance measure $R_{D}$ dominates the other measures,
+%more complex\footnote{in terms of words between both entities, participating
+%in a relation} relations are less likely to be discovered.
+%
+%The \emph{term frequency} turns out to be the least robust statistic. Usually,
+%the frequency of a specific term co-occurring with a variable name within one
+%document is rather low. Thus, the derived ranking is relatively volatile. In
+%our experiments, we chose $\gamma$ to be 0.75 ($\alpha = \beta = 1$) for a
+%more robust ranking.
+%to  E.g., `Hamiltonian' as well as `length' are both valid entities. Obviously, the number of documents containing one of these words, within a corpus like Wikipedia, differs a lot.
+%
+%Therefore, we only use the normalized term frequency. $t$ and $w$ are terms.
+%$f(t,d)$ denotes the frequency of a term within a document $d$.
+%
+%\begin{equation}
+%	\label{eq:tf}
+%	\mathrm{tf}(t,d) = \frac{\mathrm{f}(t,d)}{\max\{\mathrm{f}(w,d):w \in d\}}
+%\end{equation}
+%
 
 \section{Implementation}
-
-\subsection{Overview of the processor}
 The MLP processing system \cite{github} is basically a set of PACTs, where
 data flows through. In contrast to other programming models like Map/Reduce,
 PACTs can operate on multiple inputs. At some point of time, one needs an
@@ -281,9 +209,9 @@ Finally, the rating for all nouns, contained in all candidate sentences, needs
 to be calculated.
 
 
-\subsection{Experiments}
-
-\subsubsection{Variable Retrieval}
+%\subsection{Experiments}
+\section{Evaluation}
+%\subsubsection{Variable Retrieval}
 \label{vr}
 Throughout our experiments we made some observations that had an impact on the
 accuracy of retrieving the correct set of variables. First of all, people tend
@@ -307,20 +235,7 @@ random documents and counted all matches. The resulting estimates for
 \emph{recall} and \emph{precision} are 0.99 and 0.86 respectively.
 
 
-\subsubsection{Tuning}
-The weighting parameters $\alpha$, $\beta$, and $\gamma$ in Equation
-\ref{eq:rating} are used to balance the contribution of all embedded
-statistics to the overall ranking. But these parameters need to be tuned
-carefully. Otherwise the results tend to be biased towards one parameter. In
-other words, if the distance measure $R_{D}$ dominates the other measures,
-more complex\footnote{in terms of words between both entities, participating
-in a relation} relations are less likely to be discovered.
 
-The \emph{term frequency} turns out to be the least robust statistic. Usually,
-the frequency of a specific term co-occurring with a variable name within one
-document is rather low. Thus, the derived ranking is relatively volatile. In
-our experiments, we chose $\gamma$ to be 0.75 ($\alpha = \beta = 1$) for a
-more robust ranking.
 
 \section{Conclusion}
 Our experiments showed that combining a POS tagger with numerical statistics
@@ -345,6 +260,9 @@ research.
 
 
 %460 identifiers
-
+\begingroup
+\let\clearpage\relax
 \bibliography{mlp-papers}
+\endgroup
+
 \end{document}
