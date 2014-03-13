@@ -1,6 +1,5 @@
 \documentclass[runningheads]{llncs}
 
-
 \usepackage[utf8]{inputenc}
 \usepackage[numbers, comma, sort]{natbib}
 \bibliographystyle{apalike}
@@ -33,32 +32,31 @@
 \author{Robert Pagel \and Moritz Schubotz}
 \authorrunning{Pagel, Schubotz}
 
-\institute{Berlin Institute of Technology, Database Systems and Information Management Group,\\
+\institute{TU Berlin, Database Systems and Information Management Group,\\
 Einsteinufer 17, 10587 Berlin, Germany\\
 \mailsa\\
-\url{http://www.dima.tu-berlin.de/}}
+\url{http://demo.formulasearchengine.com/}}
 
 
 \maketitle
 
 
 \begin{abstract}
-In natural language words and phrases themselves imply the semantics.
-Complimentary, the meaning of identifiers in mathematical formulae is undefined.
-Thus scientist must study the context to decode the meaning.
+In natural language, words and phrases themselves imply the semantics.
+In contrast, the meaning of identifiers in mathematical formulae is undefined.
+Thus scientists must study the context to decode the meaning.
 The \emph{Mathematical Language Processing} project, aims to support that process and
 presents automated identifier definition discovery.
-
 Ordinary natural language processing approaches are trained on large, manually annotated news
-corpora. They fall short in reasonable quality of definition discovery for scientific texts.
+corpora.
+They fall short in reasonable quality of definition discovery for scientific texts.
 We use statistical methods to discover definitions in the surrounding text.
-
 The evaluation of our prototypical system, applied on the Wikipedia text
 corpus shows that our approach augments the user experience
-substantially. While hovering the identifiers occurring
-in the formula tool-tips with the most probable definitions
+substantially.
+While hovering the identifiers in the formula, tool-tips with the most probable definitions
 occur.
-Tests with random samples show, that the displayed definitions provide
+Tests with random samples show that the displayed definitions provide
 a good match with the actual meaning of the identifiers.   
 \keywords{machine learning, text mining, parallel computing}
 \end{abstract}
@@ -67,22 +65,23 @@ a good match with the actual meaning of the identifiers.
 \section{Introduction}
 
 Mathematical formulae are a viable source of information for a wide range of
-scientists. Often, they contain variables that are unknown or ambiguous to the reader.
+scientists.
+Often, they contain variables that are unknown or ambiguous to the reader.
 Therefore, one needs to study the surrounding text to find the relevant definition.
+An automatic information retrieval system can be used to reduce the reader's
+effort.
+Students and scientists of other disciplines would especially profit from a 
+system that helps them to understand formulae.
 
-An automatic information retrieval system can be used to reduce the readers
-effort. Especially students and scientists of other
-disciplines would profit from a system that helps them to understand formulae.
-
-To build such a system a labeled text corpus that annotates variables
-and their definition is desirable. At the project start, such a corpus was not available.
-%Unfortunately, no one has built . Instead of labeling large amounts of text by hand,
+To build such a system, a labeled text corpus that annotates variables
+and their definition is desirable.
+At the project start, such a corpus was not available.
 Consequently, we use simple statistical assumptions about co-occurrences between identifiers
-and their potential definition. In combination with the Stratosphere system
-that is capable of scalable data processing,  we are able to generate a large amount of 
-definition relation candidates in a reasonable and a little implementation effort.
-% the data processing system Stratosphere we are able to analyze large text corpora   and a system that  investigate a potential way of automatically labeling large corpora with a set
-%of statistical assumptions.
+and their potential definition.
+In combination with the Stratosphere system
+that is capable of scalable data processing,  we generate a large amount of 
+definition relation 
+candidates fast with only minimal implementation overhead to ensure the scalability of our algorithm.
 
 We chose the Wikipedia text corpus as a target because of two facts.
 First, it is easy to extract the formulas and identifiers from the text,
@@ -90,9 +89,11 @@ since the input language for formula texvc is very restrictive.
 Second, we can leverage the semantic information between mark-up and
 word tokens, e.g., hyperlinks.
 
-The English Wikipedia contains roughly four million articles. Even if we only
-pick articles containing \texttt{<math/>} tag, our processor still needs
-to compute tens of thousands of articles. Especially when using a maximum
+The English Wikipedia contains roughly four million articles.
+Even if we only
+pick articles containing the \texttt{<math/>} tag, our processor still needs
+to compute with tens of thousands of articles.
+Especially when using a maximum
 entropy \emph{POS} tagger \cite{Rathna96}, like the one in Stanford's NLP
 framework, one can make use of a parallel processing system to speed up
 computation.
@@ -102,9 +103,9 @@ on the PACT programming model \cite{Alexandrov2010}.
 
 
 \paragraph{Related Work}
-\citeauthor{Quoc2010}\cite{Quoc2010} proposed an approach for
+\citeauthor{Quoc2010} \cite{Quoc2010} proposed an approach for
 relating whole formulas to sentences and their describing paragraphs.
-\citeauthor{Yokoi}\cite{Yokoi} trained a \emph{support vector machine} to extract
+\citeauthor{Yokoi} \cite{Yokoi} trained a \emph{support vector machine} to extract
 natural language descriptions for mathematical expressions.
 
 
@@ -115,138 +116,54 @@ second we determine their description from the surrounding text.
 
 Inspired by the \emph{Distant Supervision} approach \cite{Mintz2008},
 we assume that the identifier and the definition co-occur in the same sentence.
-Furthermore, we restrict ourselves to identifiers that co-occur with a noun
-phrase in one sentence in the document at least.
-
-For each description candidate we use the weighted sum
+Each description candidate is scored with the weighted sum
 \begin{equation} \label{eq:rating}
-	R(n,\Delta,t,d)=\frac{\alpha{R}_{\sigma_\mathrm d}(\Delta)
-		+\beta{R}_{\sigma_\mathrm s}(n)
-		+\gamma\mathrm{tf}(t,d)}{\alpha+\beta+\gamma} \mapsto [0;1]
+R(n,\Delta,t,d)=\frac{\alpha{R}_{\sigma_\mathrm d}(\Delta)
++\beta{R}_{\sigma_\mathrm s}(n)
++\gamma\mathrm{tf}(t,d)}{\alpha+\beta+\gamma} \mapsto [0;1].
 \end{equation}
-that respects the distance $\Delta$ between identifier and definition term $t$, the distance $n$ between the display-style equation and th sentence that contains the term and the identifier and the term frequency $\mathrm{tf}(t,d)$ in the current document $d$ 
-with a normal distributed distance measure $R_\sigma(\Delta)= \exp\left[-\frac{1}{2}\frac{\Delta^2-1}{\sigma^2}\right].$
-Our model assumption is that the probability to find a relation at $\Delta=1$ like for example in \emph{the energy $E$ and the mass $m$} is maximal, i.e. $R_{\sigma_\mathrm d}(1)=1$.  In order to determine the full width half maximum of our distribution we evaluated some articles manually and found $R_{\sigma_\mathrm d}(1)\approx 2 R_{\sigma_\mathrm d}(5)$ and thus $\sigma_d=\sqrt\frac{5^2-1}{2\ln 2}$.
+It respects the distance $\Delta$ between identifier and definition term $t$, the distance $n$ between the display-style equation and the sentence that contains the term and the identifier and the term frequency $\mathrm{tf}(t,d)$ in the current document $d$.
+The distance was normalized with $R_\sigma(\Delta)= \exp\left[-\frac{1}{2}\frac{\Delta^2-1}{\sigma^2}\right].$
+We assume that the probability to find a relation at $\Delta=1,$ is maximal.  For example in the text fragment \emph{the energy $E$ and the mass $m$} $\Delta(E,\textsf{energy})=\Delta(m,\textsf{mass})=1$ and $R_{\sigma_\mathrm d}(1)=1.$  
+In order to determine the full width at half maximum of our distribution we evaluated some articles manually and found $R_{\sigma_\mathrm d}(1)\approx 2 R_{\sigma_\mathrm d}(5)$ and thus 
+$\sigma_d=\sqrt\frac{12}{\ln 2}$.
 
-The probability to find a correct definition decays for 50 \% within three sentences. Consequently  $\sigma_\mathrm s=2\left({\ln 2}\right)^{-\frac{1}{2}}$.
+The probability to find a correct definition decays for 50\% within three sentences.
+Consequently  $\sigma_\mathrm s=2\left({\ln 2}\right)^{-\frac{1}{2}}$.
 
-The classic tf-idf \cite{Salton86} statistic reflects the importance of a term to a document. For our task the inverse document frequency (idf)  would assign high penalties to frequent which are valid definitions for identifiers like in the example `Energy` and `Einstein`. Consequently we used just the term frequency which still had an impact on the overall result that seemed to high in our manual experiments. Therefore, we use the tuning parameters $\gamma=0.75$ and $\alpha = \beta = 1$.
-
-
-%The weighting parameters $\alpha$, $\beta$, and $\gamma$ in Equation
-%\ref{eq:rating} are used to balance the contribution of all embedded
-%statistics to the overall ranking. But these parameters need to be tuned
-%carefully. Otherwise the results tend to be biased towards one parameter. In
-%other words, if the distance measure $R_{D}$ dominates the other measures,
-%more complex\footnote{in terms of words between both entities, participating
-%in a relation} relations are less likely to be discovered.
-%
-%The \emph{term frequency} turns out to be the least robust statistic. Usually,
-%the frequency of a specific term co-occurring with a variable name within one
-%document is rather low. Thus, the derived ranking is relatively volatile. In
-%our experiments, we chose $\gamma$ to be 0.75 ($\alpha = \beta = 1$) for a
-%more robust ranking.
-%to  E.g., `Hamiltonian' as well as `length' are both valid entities. Obviously, the number of documents containing one of these words, within a corpus like Wikipedia, differs a lot.
-%
-%Therefore, we only use the normalized term frequency. $t$ and $w$ are terms.
-%$f(t,d)$ denotes the frequency of a term within a document $d$.
-%
-%\begin{equation}
-%	\label{eq:tf}
-%	\mathrm{tf}(t,d) = \frac{\mathrm{f}(t,d)}{\max\{\mathrm{f}(w,d):w \in d\}}
-%\end{equation}
-%
+The classic tf-idf \cite{Salton86} statistic reflects the importance of a term to a document.
+For our task the inverse document frequency (idf)  would assign high penalties to frequent which are valid definitions for identifiers like in the example `Energy' and `Einstein'.
+Consequently we used just the term frequency which still had an impact on the overall result 
+that seemed too high in our manual experiments.
+Therefore, we use the tuning parameters $\gamma=0.75$ and $\alpha = \beta = 1$.
 
 \paragraph{Implementation}
 We implemented the MLP processing system \cite{github} as Stratosphere data-flow using JAVA which allows for scalable execution, application of complex higher order functions and easy integration of third party tool like Stanford NLP and the Mylyn framework.
-%
-%In contrast to MapReduce that supports only the second order functions map and reduce, we used the CoGroup function 
-%
-%\tikzset{actor/.style={
-%        rectangle,
-%        minimum size=6mm,
-%        very thick,
-%        draw=gray!50!black!50,
-%        top color=white,
-%        bottom color=gray!50!black!20
-%    },
-%    arrow/.style={
-%        -latex, thick, shorten <=2pt,shorten >=2pt
-%    }
-%}
-%\begin{figure}[H]
-%	\begin{tikzpicture}[node distance=5mm and 8mm]
-%		\node (Input) [align=center]{Wiki Dump};
-%		\node (DocumentParser) [actor, right=of Input, align=center] {\emph{Map}\\\textbf{Parser}};
-%		\node (Candidates) [actor, right=of DocumentParser, align=center] {\emph{CoGroup}\\\textbf{Kernel}};
-%		\node (Sentence) [actor, above=of DocumentParser, align=center] {\emph{Map}\\\textbf{Tagger}};
-%		\node (Filter) [actor, right=of Candidates, align=center] {\emph{Reduce}\\\textbf{Filter}};
-%		\node (Output) [right=of Filter,align=center]{Raw\ Candidates};
-%		\draw[arrow] (Input)--(DocumentParser);
-%		\draw[arrow] (DocumentParser)--(Sentence);
-%		\draw[arrow] (DocumentParser)--(Candidates);
-%		\draw[arrow] (Sentence.east)--(Candidates.north);
-%		\draw[arrow] (Candidates)--(Filter);
-%		\draw[arrow] (Filter)--(Output);
-%	\end{tikzpicture}
-%\caption{Data flow of the Stratosphere program: We used an
-%ordered list of tokenized sentences and a list of identified variables, to
-%compute the ranking score. A \emph{CoGroup Contract} takes both lists and
-%computes the subsets, build upon distinct document keys. Finally, a
-%\emph{Reduce Contract} filters out results below a given threshold $\theta$.}
-%\end{figure}
-%
-%There are three computation heavy parts in the processor. First, the raw
-%Wikipedia document dumps need to be transformed into plain text. At the same
-%step, the formulas need to be evaluated and replaced by place-holder words. We
-%used the \emph{WikiText} framework of the Mylyn project with a custom builder
-%to transform the document into plain text. For analyzing the \TeX \ mark-up in
-%the \texttt{<math/>} tags, \emph{SnuggleTeX} transforms the formulas into
-%their MathML representations, where variable names can be easily extracted.
-%
-%The second computation heavy part is tokenization and tagging of the plain
-%text documents. We used the Stanford maximum entropy tagger with the \emph{WSJ
-%left3words} language model.
-%
-%Finally, the rating for all nouns, contained in all candidate sentences, needs
-%to be calculated.
-%
 
-%\subsection{Experiments}
 \section{Evaluation}
 We extracted 460 identifiers definition tuples in 550000 relations with a
-high score ($>0.8$). The most common identifier definition tuples were 
+high score ($>0.8$).
+The most common identifier definition tuples were 
 number $n$ (1709), time $t$	(1480), mass $M$ (1042), radius $r$ (752), temperature	$T$	(666), angle $\theta$ (639), group $G$ (635).
-%\todo{I don't trust this evaluation and I'm trying to rewrite that}
-%%\subsubsection{Variable Retrieval}
-%\label{vr}
-%Throughout our experiments we made some observations that had an impact on the
-%accuracy of retrieving the correct set of variables. First of all, people tend
-%to incorrectly use \TeX\ trying to create formulas. E.g.,
-%\texttt{\textbackslash text\{log\}} is more often used than the correct
-%operator \texttt{\textbackslash log}. Another problem is that sometimes people
-%use indices as a form of annotation, like $T_{before}$, $R_{A}$, and $R_{B}$.
-%These ambiguities lead to a increased number of false positives.
-%
-%We took a very conservative approach and preprocessed all formulas.
-%\texttt{\textbackslash text\{\}} blocks along with plain subscriptions will be
-%removed before analysis. Moreover, we created a comprehensive blacklist to
-%improve the results further. Short words like `a' and `i', which are very
-%common, could be easily matched by our processor if a formula contains one of
-%those symbols. Additionally, we blacklist common mathematical operators,
-%constants, and functions.
-
-Because of the fact, that we do not have any annotated test corpora,
-evaluation has to be performed by hand. Therefore, we took a sample of 30
-random documents and counted all matches. The resulting estimates for
+Because we do not have any annotated test corpora,
+evaluation has to be performed by hand.
+Therefore, we took a sample of 30
+random documents and counted all matches.
+The resulting estimates for
 \emph{recall} and \emph{precision} are 0.99 and 0.86 respectively.
 
 
 
 \section{Further work}
-Our first intuition was to discover grammatical patters like \emph{let \texttt{variable} be \texttt{definition}} or were \emph{\texttt{variable} (indicates/stands for/ denotes)\texttt{definition}} based on the statistical findings. However, our impression is now that the performance gain would bi little.
+Our first intuition was to discover grammatical patters 
+like \emph{let \texttt{variable} be \texttt{definition}} or 
+were \emph{\texttt{variable} (indicates/stands for/ denotes)\texttt{definition}} based on the statistical findings.
+However, our impression is now that the performance gain would \todo{``be little'' doesn't read good.}be little.
 
-Now, we are thinking to improve the distance measure between identifier and definition by considering the grammatical structure of the sentence. I.e the amount of distance added to scoring function should depend on the grammatical type of the relation between the words.
+Now we are thinking to improve the distance measure between identifier and definition by 
+considering the grammatical structure of the sentence,
+i.e., the amount of distance added to the scoring function should depend on the grammatical 
+type of the relation between the words.
 
 To improve the robustness of the \emph{term frequency} measure further, one
 might cluster sets of scientific documents, based on their specific field of
@@ -255,14 +172,20 @@ research.
 
 \section{Conclusion}
 Our experiments showed that combining a POS tagger with numerical statistics
-about the text surface, can lead to quality results. However, this approach is
+about the text surface, can lead to quality results.
+However, this approach is
 only applicable under certain conditions. 
-If there is only few data for some identifier our statistical approach tends to fail. In that situations other methods, especially supervised ones, are used to
-bootstrap a language model. Unfortunately, we still need a labeled test
+For seldom identifiers our statistical approach tends to fail.
+In that situation, other methods, especially supervised ones, are used to
+bootstrap a language model.
+Unfortunately, we still need a labeled test
 corpus to measure the performance of a classifier, trained with our generated
 data.
 
-Furthermore it would be nice to have a systematic approach for a wise choice of the ranking parameters.
+Furthermore, a systematic approach for determining a wise choice of the ranking parameters might improve the overall performance of our system a lot.
+\paragraph*{Acknowledgment}
+Thanks to Howard Cohl for proof reading the paper and to the course instructor of the database project course in fall 2012 Holmer Hemsen. The implementation and a first draft of the this papers was completed in the scope of this course.
+
 
 \begingroup
 \let\clearpage\relax
