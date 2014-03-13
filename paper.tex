@@ -8,7 +8,6 @@
 \setcounter{tocdepth}{3}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{todonotes}
 \usepackage{wrapfig}
 
 
@@ -33,7 +32,9 @@
 \author{Robert Pagel \and Moritz Schubotz}
 \authorrunning{Pagel, Schubotz}
 
-\institute{TU Berlin, Database Systems and Information Management Group,\\
+\institute{
+Database Systems and Information Management Group,\\
+Technische Universit\"{a}t Berlin,
 Einsteinufer 17, 10587 Berlin, Germany\\
 \mailsa\\
 \url{http://demo.formulasearchengine.com/}}
@@ -46,7 +47,7 @@ Einsteinufer 17, 10587 Berlin, Germany\\
 In natural language, words and phrases themselves imply the semantics.
 In contrast, the meaning of identifiers in mathematical formulae is undefined.
 Thus scientists must study the context to decode the meaning.
-The \emph{Mathematical Language Processing} project, aims to support that process and
+The \emph{Mathematical Language Processing} project aims to support that process and
 presents automated identifier definition discovery.
 Ordinary natural language processing approaches are trained on large, manually annotated news
 corpora.
@@ -77,8 +78,8 @@ system that helps them to understand formulae.
 To build such a system, a labeled text corpus that annotates variables
 and their definition is desirable.
 At the project start, such a corpus was not available.
-Consequently, we use simple statistical assumptions about co-occurrences between identifiers
-and their potential definition.
+We use simple statistical assumptions about co-occurrences between identifiers
+and their potential definition to extract the meaning of the identifiers from their context.
 In combination with the Stratosphere system
 that is capable of scalable data processing,  we rapidly generate a large amount of 
 definition relation 
@@ -86,9 +87,9 @@ candidates with only minimal implementation overhead to ensure the scalability o
 
 %\pagebreak
 \begin{wrapfigure}{r}{0.5\textwidth}
-	\label{fig:screenshot}
+        \label{fig:screenshot}
   \includegraphics[width=0.5\textwidth]{screenshot}
-  \caption{Screen-shot of the energy mass relation page `Mass–energy equivalence`, while hovering the letter `E`.}
+  \caption{Screenshot of the energy mass relation page `Mass–energy equivalence`, while hovering the letter `E`.}
   \vspace{-20pt}
 \end{wrapfigure}
 We chose the Wikipedia text corpus as a target because of two facts.
@@ -108,7 +109,7 @@ Therefore we implement the proposed strategy with the Stratosphere system based
 on the PACT programming model \cite{Alexandrov2010}.
 
 
-\paragraph{Related Work}
+\paragraph{Related Work.}
 
 \citeauthor{Quoc2010} \cite{Quoc2010} proposed an approach for
 relating whole formulas to sentences and their describing paragraphs.
@@ -130,54 +131,58 @@ R(n,\Delta,t,d)=\frac{\alpha{R}_{\sigma_\mathrm d}(\Delta)
 +\beta{R}_{\sigma_\mathrm s}(n)
 +\gamma\mathrm{tf}(t,d)}{\alpha+\beta+\gamma} \mapsto [0;1].
 \end{equation}
-It respects the distance $\Delta$ between identifier and definition term $t$, the distance $n$ between the display-style equation and the sentence that contains the term, the identifier and the term frequency $\mathrm{tf}(t,d)$ in the current document $d$.
+It depends on the distance $\Delta$ between identifier and definition term $t$, the distance $n$ between the display-style equation and the sentence that contains the term, and the identifier and the term frequency $\mathrm{tf}(t,d)$ in the current document $d$.
 The distance was normalized with $R_\sigma(\Delta)= \exp\left[-\frac{1}{2}\frac{\Delta^2-1}{\sigma^2}\right].$
-We assume that the probability to find a relation at $\Delta=1,$ is maximal.  For example in the text fragment \emph{the energy $E$, and the mass $m$} $\Delta(E,\textsf{energy})=\Delta(m,\textsf{mass})=1$ and $R_{\sigma_\mathrm d}(1)=1.$  
-In order to determine the full width at half maximum of our distribution we evaluated some articles manually and found $R_{\sigma_\mathrm d}(1)\approx 2 R_{\sigma_\mathrm d}(5)$ and thus 
+We assume that the probability to find a relation at $\Delta=1$ is maximal.  For example in the 
+text fragment \emph{the energy $E$, and the mass $m$,}  
+In order to determine the full width at half maximum of our distribution, we evaluated some articles manually and found $R_{\sigma_\mathrm d}(1)\approx 2 R_{\sigma_\mathrm d}(5)$ and thus 
 $\sigma_d=\sqrt\frac{12}{\ln 2}$.
 The probability to find a correct definition decays for 50\% within three sentences.
 Consequently  $\sigma_\mathrm s=2\left({\ln 2}\right)^{-\frac{1}{2}}$.
 
 The classic tf-idf \cite{Salton86} statistic reflects the importance of a term to a document.
-For our task, the inverse document frequency (idf) would assign high penalties to frequent words like `energy` in comparison to seldom words like `Einstein` which are valid definitions for identifiers.
-As the influence of $\mathrm{tf}(t,d)$ on the overall ranking \ref{eq:rating}, seems to be very high, we reduce the impact with the tuning parameters $\gamma=0.75$ and $\alpha = \beta = 1$.
+For our task, the inverse document frequency (idf) would assign high penalties to 
+frequent words like `energy', in comparison to 
+%\todo{I replaced `seldom words' with `words seldom seen'.  Is that ok?}
+words seldom seen like `Einstein', which are valid definitions for identifiers.
+As the influence of $\mathrm{tf}(t,d)$ on the overall ranking (\ref{eq:rating}) seems to be very high, we reduce the impact with the tuning parameters $\gamma=0.75$ and $\alpha = \beta = 1$.
 
-\paragraph{Implementation}
-We implemented the MLP processing system \cite{github} as Stratosphere data-flow using JAVA which allows for scalable execution, application of complex higher order functions and easy integration of third party tools like Stanford NLP and the Mylyn framework.
+\paragraph{Implementation.}
+We implemented the MLP processing system \cite{github} as Stratosphere data-flow using Java which allows for scalable execution, application of complex higher order functions and easy integration of third party tools like Stanford NLP and the Mylyn framework.
 \section{Evaluation}
 We extracted 460 identifiers definition tuples in 550000 relations with a
-high score ($>0.8$).
-
-The most common identifier definition tuples were 
-number $n$ (1709), time $t$ (1480), mass $M$ (1042), radius $r$ (752), temperature	$T$	(666), angle $\theta$ (639), group $G$ (635).
+high score ($>0.8$).  The most common identifier definition tuples were 
+number $n$ (1709), time $t$ (1480), mass $M$ (1042), radius $r$ (752), 
+temperature $T$ (666), angle $\theta$ (639), group $G$ (635).
 Because we do not have any annotated test corpora,
 evaluation has to be performed by hand.
 Therefore, we took a sample of 30
 random documents and counted all matches.
 Most of the retrieved definitions were considered as relevant.
-Furthermore, for more than 50 \% of the investigated identifiers our system detects are relevant definition.
-However, we neither consider identifiers with subscripts nor identifiers that do not occur in the surrounding text.  
+Furthermore, for more than 50\% of the investigated identifiers, 
+the most probable meanings detected by our system were relevant.
+However, we neither consider identifiers with subscripts, nor identifiers that do not occur in the surrounding text.  
 %The resulting estimates for
 %\emph{recall} and \emph{precision} are 0.99 and 0.86 respectively.
 
 
 
 \section{Further work}
-Our first intuition was to discover grammatical patters 
+Our original intuition was to discover grammatical patters 
 like \emph{let \texttt{variable} be \texttt{definition}} or 
 were \emph{\texttt{variable} (indicates/stands for/ denotes)\texttt{definition}} based on the statistical findings.
-However, our impression is that there would not be significant performance gain.
+However, our impression is that this 
+would not lead to significant performance gain.
 
 The distance measure
 $R_{\sigma_d}$
-fails for the example of figure \ref{fig:screenshot} since
+fails for the example of Fig.~\ref{fig:screenshot} since
 $\Delta(\mathsf{energy},E)=\Delta(\mathsf{mass},m)=2$.
 We plan to consider the grammatical structure of the sentence for an improved distance measure $\Delta^{+} : \Delta^+(\mathsf{energy},E)\ge\Delta^+(\mathsf{mass},m)$.
-Currently, we use the score $R$ to identify the most probably definition-identifier tuple on each page, even it occurs multiple times on the page.
-%((E|e)nergy.{1,100}''E''|''E''.{1,100}(E|e)nergy)
-For the example the relation `energy-$E$` was found 21 times by our system on the page.
-A promising approach, is to use $R^\Sigma=\sum_{i=1}^n 2^{-i} R_i $ where $R_i$ is a sorted list i.e. $R_1$ the highest ranked definition for that relation according to the current measure $R$.
-
+Currently, we use the score $R$ to identify the most probably definition-identifier tuple on each page, even if it occurs multiple times on the page.
+For example, on the `Mass-energy equivalence` page 21 sentences contain the combination of the identifier $E$ and the noun `energy`.
+A promising approach, is to use $R^\Sigma=\sum_{i=1}^n 2^{-i} R_i,$ where $R_i$ is a 
+sorted list, i.e., $R_1$ the highest ranked definition for that relation according to the current measure $R$.
 To improve the robustness of the \emph{term frequency} measure further, one
 might cluster sets of scientific documents, based on their specific fields of
 research.
@@ -188,15 +193,16 @@ Our experiments showed that combining a POS tagger with numerical statistics
 about the text surface, can lead to quality results.
 However, this approach is
 only applicable under certain conditions. 
-For seldom identifiers our statistical approach tends to fail.
+For identifiers which
+are seldom seen, our statistical approach tends to fail.
 In that situation, other methods, especially supervised ones, are used to
 bootstrap a language model.
 Unfortunately, they require a labeled test
 corpus to measure the performance of a classifier that could be trained with our generated data.
-Currently, we are investigating a cooperation with the group of professor \citeauthor{Aizawa2013} and the use of the NTCIR-Math-10 Task, Math Understanding Subtask gold standard dataset \cite{Aizawa2013} for further experiments.
+Currently, we are planning a cooperation with the group of professor \citeauthor{Aizawa2013} from the National Institute of Informatics in Japan for further research on that topic. In that context we consider to use the NTCIR-Math-10 Task, Math Understanding Subtask gold standard dataset \cite{Aizawa2013} for a comparable evaluation.
 Furthermore, a systematic approach for determining a wise choice of the ranking parameters should significantly improve the overall performance of our system.
-\paragraph*{Acknowledgment}
-Thanks to Howard Cohl for proof reading the paper and to the course instructor of the database project course in fall 2012, Holmer Hemsen. The implementation and a first draft of this paper was completed the duration of this course.
+\paragraph*{Acknowledgments.}
+Thanks to Howard Cohl for proof reading the paper and to Holmer Hemsen, the course instructor of the database project course at TU-Berlin in Fall 2012. The implementation and a first draft of this paper was completed in the duration of this course.
 
 
 \begingroup
