@@ -8,6 +8,7 @@
 \setcounter{tocdepth}{3}
 \usepackage{graphicx}
 \usepackage{float}
+
 \usepackage{wrapfig}
 
 
@@ -50,7 +51,7 @@ Thus scientists must study the context to decode the meaning.
 The \emph{Mathematical Language Processing} project aims to support that process and
 presents automated identifier definition discovery.
 Ordinary natural language processing approaches are trained on large, manually annotated news
-corpora.
+corpora for instance.
 They fall short in reasonable quality of definition discovery for scientific texts.
 We use statistical methods to discover definitions in the surrounding text.
 The evaluation of our prototypical system, applied on the Wikipedia text
@@ -60,7 +61,7 @@ While hovering the identifiers in the formula, tool-tips with the most probable 
 occur.
 Tests with random samples show that the displayed definitions provide
 a good match with the actual meaning of the identifiers.   
-\keywords{machine learning, text mining, parallel computing}
+\keywords{definition discovery, text mining, parallel computing}
 \end{abstract}
 
 
@@ -89,7 +90,7 @@ candidates with only minimal implementation overhead to ensure the scalability o
 \begin{wrapfigure}{r}{0.5\textwidth}
         \label{fig:screenshot}
   \includegraphics[width=0.5\textwidth]{screenshot}
-  \caption{Screenshot of the energy mass relation page `Mass–energy equivalence`, while hovering the letter `E`.}
+  \caption{Screenshot of the energy mass relation page `Mass–energy equivalence', while hovering the letter `E'.}
   \vspace{-20pt}
 \end{wrapfigure}
 We chose the Wikipedia text corpus as a target because of two facts.
@@ -135,7 +136,7 @@ It depends on the distance $\Delta$ between identifier and definition term $t$, 
 The distance was normalized with $R_\sigma(\Delta)= \exp\left[-\frac{1}{2}\frac{\Delta^2-1}{\sigma^2}\right].$
 We assume that the probability to find a relation at $\Delta=1$ is maximal.  For example in the 
 text fragment \emph{the energy $E$, and the mass $m$,}  
-In order to determine the full width at half maximum of our distribution, we evaluated some articles manually and found $R_{\sigma_\mathrm d}(1)\approx 2 R_{\sigma_\mathrm d}(5)$ and thus 
+in order to determine the full width at half maximum of our distribution, we evaluated some articles manually and found $R_{\sigma_\mathrm d}(1)\approx 2 R_{\sigma_\mathrm d}(5)$ and thus 
 $\sigma_d=\sqrt\frac{12}{\ln 2}$.
 The probability to find a correct definition decays for 50\% within three sentences.
 Consequently  $\sigma_\mathrm s=2\left({\ln 2}\right)^{-\frac{1}{2}}$.
@@ -168,9 +169,9 @@ However, we neither consider identifiers with subscripts, nor identifiers that d
 
 
 \section{Further work}
-Our original intuition was to discover grammatical patters 
+Our original intuition was to discover grammatical patterns 
 like \emph{let \texttt{variable} be \texttt{definition}} or 
-were \emph{\texttt{variable} (indicates/stands for/ denotes)\texttt{definition}} based on the statistical findings.
+were \emph{\texttt{variable} (indicates/stands for/denotes) \texttt{definition}} based on the statistical findings.
 However, our impression is that this 
 would not lead to significant performance gain.
 
@@ -180,9 +181,9 @@ fails for the example of Fig.~\ref{fig:screenshot} since
 $\Delta(\mathsf{energy},E)=\Delta(\mathsf{mass},m)=2$.
 We plan to consider the grammatical structure of the sentence for an improved distance measure $\Delta^{+} : \Delta^+(\mathsf{energy},E)\ge\Delta^+(\mathsf{mass},m)$.
 Currently, we use the score $R$ to identify the most probably definition-identifier tuple on each page, even if it occurs multiple times on the page.
-For example, on the `Mass-energy equivalence` page 21 sentences contain the combination of the identifier $E$ and the noun `energy`.
+For example, on the `Mass-energy equivalence' page, 21 sentences contain the combination of the identifier $E$ and the noun `energy'.
 A promising approach, is to use $R^\Sigma=\sum_{i=1}^n 2^{-i} R_i,$ where $R_i$ is a 
-sorted list, i.e., $R_1$ the highest ranked definition for that relation according to the current measure $R$.
+sorted list, were $R_1$ is the highest ranked definition for that relation according to the current measure $R$.
 To improve the robustness of the \emph{term frequency} measure further, one
 might cluster sets of scientific documents, based on their specific fields of
 research.
@@ -199,7 +200,9 @@ In that situation, other methods, especially supervised ones, are used to
 bootstrap a language model.
 Unfortunately, they require a labeled test
 corpus to measure the performance of a classifier that could be trained with our generated data.
-Currently, we are planning a cooperation with the group of professor \citeauthor{Aizawa2013} from the National Institute of Informatics in Japan for further research on that topic. In that context we consider to use the NTCIR-Math-10 Task, Math Understanding Subtask gold standard dataset \cite{Aizawa2013} for a comparable evaluation.
+Currently, we are planning to use the
+NTCIR-Math-10 Task, Math Understanding Subtask gold standard dataset \cite{overview}
+for a comparable evaluation.
 Furthermore, a systematic approach for determining a wise choice of the ranking parameters should significantly improve the overall performance of our system.
 \paragraph*{Acknowledgments.}
 Thanks to Howard Cohl for proof reading the paper and to Holmer Hemsen, the course instructor of the database project course at TU-Berlin in Fall 2012. The implementation and a first draft of this paper was completed in the duration of this course.
@@ -211,3 +214,4 @@ Thanks to Howard Cohl for proof reading the paper and to Holmer Hemsen, the cour
 \endgroup
 
 \end{document}
+
