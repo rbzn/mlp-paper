@@ -1,0 +1,104 @@
+m	mass of the particle	509415724
+∇	the gradient operator	509415724
+∇²	laplacian	509415724
+Ψ	wave function	509415724
+N	particles	509415724
+n	particle	509415724
+∇n	gradient for particle n	509415724
+∇²n	laplacian for particle	509415724
+M	mass of the collection of particles	509415724
+V	potential enery function	509415724
+t	time	509415724
+U	unitary operator	509415724
+H	Hermitian operator	509415724
+V0	constant potential	509415724
+k	effective spring constant	509415724
+m	mass	509415724
+r	three dimensional position vector	509415724
+Iᵪᵪ	moment of inertia components	509415724
+Iᵧᵧ	moment of inertia components	509415724
+Izz	moment of inertia components	509415724
+Jᵪ	total angular momentum operators	509415724
+Jᵧ	total angular momentum operators	509415724
+Jz	total angular momentum operators	509415724
+q₁	charges	509415724
+q₂	charges	509415724
+qⱼ	charges	509415724
+ϕ	electrostatic potential of charges qj	509415724
+d	electric dipol moment	509415724
+q	magnitude	509415724
+E	electrostatic field	509415724
+μ	magnetic dipol moment	509415724
+B	magnetostatic field	509415724
+gs	spin gyromagnetic ratio	509415724
+e	electron charge	509415724
+S	Spin operator vector	509415724
+q	charged particle	509415724
+ϕ	scalar potential	509415724
+A	vetor potential	509415724
+P	canonical momentum operator	509415724
+U	nontrivial unitary operator	509415724
+G	Hermitian generator of U	509415724
+πn	conjugate momentum variables	509415724
+
+H	harmonic mean	509754903
+x₁	positive real number	509754903
+x₂	positive real number	509754903
+xn	positive real number	509754903
+w₁	weights	509754903
+wn	weights	509754903
+x₁	dataset	509754903
+xn	dataset	509754903
+n	variates	509754903
+r	non zero real number	509754903
+Mʳ	rᵗʰ power mean	509754903
+a₁	real variables	509754903
+a₂	real variables	509754903
+a₃	real variables	509754903
+A	arithmetic mean	509754903
+R	quadratic mean	509754903
+s²	variance	509754903
+P	point	509754903
+BC	mirror arc	509754903
+q	distance	509754903
+t	distance	509754903
+v	distance	509754903
+a	legs	509754903
+b	legs	509754903
+h	altitude	509754903
+t	sides of the two inscribed squares	509754903
+s	sides of the two inscribed squares	509754903
+c	hypothenuse	509754903
+A	vertices	509754903
+B	vertices	509754903
+C	vertices	509754903
+D	vertices	509754903
+A	height	509754903
+B	height	509754903
+A	angle	509754903
+x	speed	509754903
+y	speed	509754903
+x	resistance	509754903
+y	resistance	509754903
+m	arthmetic mean	509754903
+x	variates	509754903
+n	population size	509754903
+E	expectation operator	509754903
+x	sample values	509754903
+wᵢ	series of value	509754903
+f	distribution	509754903
+µ	mean of the population	509754903
+f*	probability density function	509754903
+E*	length biased distribution	509754903
+σ²	variance	509754903
+X	positive random variable	509754903
+Cᵥ	coefficient of variation	509754903
+G 	geometric mean	509754903
+H₃	best estimator	509754903
+k	scale parameter	509754903
+α	shape parameter	509754903
+
+
+
+
+
