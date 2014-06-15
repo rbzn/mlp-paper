@@ -49,12 +49,13 @@ Einsteinufer 17, 10587 Berlin, Germany\\
 In natural language, words and phrases themselves imply the semantics. In
 contrast, the meaning of identifiers in mathematical formulae is undefined.
 Thus scientists must study the context to decode the meaning. The
-\emph{Mathematical Language Processing} project aims to support that process
-and presents automated identifier definition discovery. We compare two
-approaches. At first we use a simple identifier definition pattern matching
-approach. Second, we present the \emph{MLP} approach, that uses POS tag based
-distances as well as sentence positions to caculate indentifier definition
-probabilities. The evaluation of our prototypical system, applied on the
+\emph{Mathematical Language Processing} project aims to support that process.
+In this paper, we compare two approaches to discover identifier - definition tuples.
+At first we use a simple pattern matching
+approach. Second, we present the \emph{MLP} approach that uses POS tag based
+distances as well as sentence positions to calculate identifier - definition
+probabilities.
+The evaluation of our prototypical system, applied on the
 Wikipedia text corpus, shows that our approach augments the user experience
 substantially. While hovering the identifiers in the formula, tool-tips with
 the most probable definitions occur. Tests with random samples show that the
@@ -77,13 +78,16 @@ identifiers.
 
 Mathematical formulae are a viable source of information for a wide range of
 scientists. Often, they contain identifier whose meaning might be at first
-unknown or at least ambiguous to the reader (depending on their knownledge).
+unknown or at least ambiguous to the reader (depending on their knowledge).
 Therefore, one usually needs to study the surrounding text to find the
 relevant definition. An automatic information retrieval system can be used to
 reduce the reader's effort by showing the most relevant definition relation
 found to the reader. Students and scientists of other disciplines would
 especially profit from a system that helps them to understand formulae more
-quickly.
+quickly. In the long term the extracted identifier definition tuples contribute
+to an increase of machine readability of scientific publications. This builds a 
+foundation for added value services such as search, clustering and improved
+accessibility.
 
 
 To build such a system, a labeled text corpus that annotates identifiers and
