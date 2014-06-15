@@ -15,7 +15,7 @@
 \usepackage{pgfplots}
 \usepackage{tikz}
 \usetikzlibrary{arrows,backgrounds,positioning}
-
+\usepackage{todonotes}
 
 \usepackage{url}
 \urldef{\mailsa}\path|rob@clabs.cc,schubotz@tu-berlin.de |
@@ -50,11 +50,11 @@ In natural language, words and phrases themselves imply the semantics. In
 contrast, the meaning of identifiers in mathematical formulae is undefined.
 Thus scientists must study the context to decode the meaning. The
 \emph{Mathematical Language Processing} project aims to support that process
-and presents automated identifier definition discovery. Ordinary natural
-language processing approaches are trained on large, manually annotated text
-corpora. They fall short in reasonable quality of definition discovery for
-scientific texts. We use statistical methods to discover definitions in the
-surrounding text. The evaluation of our prototypical system, applied on the
+and presents automated identifier definition discovery. We compare two
+approaches. At first we use a simple identifier definition pattern matching
+approach. Second, we present the \emph{MLP} approach, that uses POS tag based
+distances as well as sentence positions to caculate indentifier definition
+probabilities. The evaluation of our prototypical system, applied on the
 Wikipedia text corpus, shows that our approach augments the user experience
 substantially. While hovering the identifiers in the formula, tool-tips with
 the most probable definitions occur. Tests with random samples show that the
@@ -68,11 +68,11 @@ identifiers.
 \section{Introduction}
 
 \begin{wrapfigure}{r}{0.4\textwidth}
-  \label{fig:screenshot}
-  \vspace{-20pt}
-  \includegraphics[width=0.4\textwidth]{screenshot}
-  \caption{Screenshot of the energy mass relation page `Mass–energy equivalence', while hovering the letter `E'.}
-  \vspace{-20pt}
+\label{fig:screenshot}
+\vspace{-20pt}
+	\includegraphics[width=0.4\textwidth]{screenshot}
+\caption{Screenshot of the energy mass relation page `Mass–energy equivalence', while hovering the letter `E'.}
+\vspace{-20pt}
 \end{wrapfigure}
 
 Mathematical formulae are a viable source of information for a wide range of
@@ -122,6 +122,38 @@ relating whole formulas to sentences and their describing paragraphs.
 \citeauthor{Yokoi} \cite{Yokoi} trained a \emph{support vector machine} to extract
 natural language descriptions for mathematical expressions.
 
+\section{Pattern-based Definition Discovery}
+
+At first, we implemented a simple identifier definition extractor that is
+based on a set of static patterns. As it is an fairly robust approach und easy
+to implement, this will serve us as a good reference point in terms of
+performance. The following patterns are being used to discover description
+terms:
+
+\begin{table}
+\vspace{-5pt}
+	\begin{center}
+		\begin{tabular}{| p{9.3cm} |}
+			\hline
+			Pattern \\
+			\hline
+			\texttt{\emph{<description>} \emph{<identifier>}} \\
+			\texttt{\emph{<identifier>} is \emph{<description>}} \\
+			\texttt{\emph{<identifier>} is the \emph{<description>}} \\
+			\texttt{let \emph{<identifier>} be the \emph{<description>}} \\
+			\texttt{\emph{<description>} is|are denoted by \emph{<identifier>}} \\
+			\texttt{\emph{<identifier>} denotes */DT \emph{<description>}} \\
+			\hline
+		\end{tabular}
+	\end{center}
+\caption{Implemented static patterns}
+\vspace{-5pt}
+\end{table}
+
+Note that in the last pattern we used a \emph{part-of-speech} tag. Actually
+determiners not only contain articles but also quatifiers and distributives.
+To increase readability this list have been shortened to `*/DT'.
+
 
 \section{Statistical Definition Discovery}
 
@@ -130,21 +162,25 @@ First, we extract the identifiers from the formulae found in an article and
 second we determine their description from the surrounding text.
 
 Extracting relevant identifiers from the article rely on the assumption that
-the author will use \texttt{<math/>} tags for all formulae. Thus said, a
+the author will use \texttt{<math/>} tags for all formulae. This said, a
 formula that is written within a text cannot be recognized, and therefor, any
 identifier that is solely used there, can never be extracted.
 
-
 The fact that we can estimate all relevant identifiers for an article (see
 Section \ref{ir}), combined with some common assumptions about the relation,
-can be exploited to largely reduced set of candidates that need to be ranked.
+can be exploited to largely reduce the set of candidates that need to be ranked.
 Please note that this reduction is essential for retrieving the correct
 relations. Otherwise almost any word would be ranked and the precision of the
 retrieval would drop significantly.
 
+The basic assumption of outr approach is that the two entities of a definition
+relation co-occur in the same sentence.
+
 The basic assumption of our approach is that if two entities take part in a
-relation, those two co-occur in the same sentence. Any other sentence is,
-therefor, irrelevant. Another assumption can be made about the lexical class
+relation, those two co-occur in the same sentence.
+Any other sentence is, therefor, irrelevant.
+
+Another assumption can be made about the lexical class
 of the desciption we want to rank. They are nouns or even noun phrases (e.g.
 \texttt{ `the effective spring constant k' } or \texttt{ `mass m of
 something'} ). Beside discarding all other words (according to their POS tag),
@@ -238,7 +274,7 @@ NLP and the Mylyn framework for mark-up parsing.
 
 \section{Evaluation}
 
-\subsubsection{Identifier Retrieval}
+\subsection{Identifier Retrieval}
 \label{ir}
 
 Throughout our experiments we made some observations that had an impact on the
@@ -259,9 +295,9 @@ We took a very conservative approach and preprocessed all formulas.
 more than a single character will be removed before analysis. Superscripts
 will also be ignored in terms of being a part of the identifier. Moreover, we
 created a comprehensive blacklist to improve the results further. Short words
-like `a' and `i', which are very common in the english language, could be
-easily matched by our processor in the sourrunding text if a formula contains
-one of those identifier, and therefor, will also be blacklisted. Additionally,
+like `a' and `i', which are very common in the English language, could be
+easily matched by our processor in the surrounding text if a formula contains
+one of those identifier, and therefore, will also be blacklisted. Additionally,
 we blacklist common mathematical operators, constants, and functions.
 
 Because of the fact, that we do not have any annotated test corpora,
@@ -273,76 +309,84 @@ a this stage.
 
 
 \subsection{Description Retrieval}
-
 We ran the program on a dataset of about 20.000 articles, all containing
 \texttt{<math/>} tags, and retrieved about 550.000 candidate relations. The
 most common definition relations were:
 
 
-\begin{tabular}{| l | p{6.8cm} | l |}
-	\hline
-	Identifier & Descriptions & Count\\
-	\hline
-	$n$ & number & 1709 \\
-	$t$ & time & 1480 \\
-	$M$ & mass & 1042 \\
-	$r$ & radius & 752 \\
-	$T$ & temperature & 666 \\
-	$\theta$ & angle & 639 \\
-	$G$ & group & 635 \\
-	\hline
-\end{tabular}
+\begin{table}[H]
+	\begin{center}
+	\begin{tabular}{| l | p{6.8cm} | l |}
+		\hline
+		Identifier & Descriptions & Count\\
+		\hline
+		$n$ & number & 1709 \\
+		$t$ & time & 1480 \\
+		$M$ & mass & 1042 \\
+		$r$ & radius & 752 \\
+		$T$ & temperature & 666 \\
+		$\theta$ & angle & 639 \\
+		$G$ & group & 635 \\
+		\hline
+	\end{tabular}
+	\end{center}
+\caption{Most common definition relations}
+\end{table}
+
 
 \paragraph{Observations.} We observed some poorly ranked relations. For
 example, in the fragment \texttt{`where $\phi$ ( $r_{i}$ ) is the electrostatic
 potential'} the distance
-$\Delta(\phi, \mathsf{electrostatic potential} ) = 5$. This is due
+$\Delta(\phi, \mathsf{electrostatic\:potential} ) = 6$. This is due
 to counting brackets and function arguments as words. Also wrongly tagged
-words like `Hamiltonian/JJ' lead to false negatives.
+words like `Hamiltonian' as an adjective leads to false negatives. Latter
 
 
 \subsubsection{Comparative Evaluation}
 
-As there were no evaluation datasets available to us, we compared our
-statistical ranking to a simple pattern matching approach. We used the
-following patterns to discover description terms:
+Due to the lack of gold standard evaluation datasets to measure the
+performance of identifer definition extractors, we've created on on our own.
+This is a very time consuming job. At the moment the dataset only contains two
+large articles (revision ids are included) with around 100 identifier
+definitions. This dataset is also available on the project repository.
 
 
-\begin{tabular}{| p{9.3cm} |}
-	\hline
-	Pattern \\
-	\hline
-	\texttt{\emph{<description>} \emph{<identifier>}} \\
-	\texttt{\emph{<identifier>} is \emph{<description>}} \\
-	\texttt{\emph{<identifier>} is the \emph{<description>}} \\
-	\texttt{let \emph{<identifier>} be the \emph{<description>}} \\
-	\texttt{\emph{<description>} is|are denoted by \emph{<identifier>}} \\
-	\texttt{\emph{<identifier>} denotes */DT \emph{<identifier>}} \\
-	\hline
-\end{tabular}
-
-\paragraph{} Due to large amount of time needed to evaluate two approaches by hand on a
-multitude of articles, we build a dataset of definition relations (98
-relations in total), that can be retrieved from two representative articles
-(revision ids are included). This dataset is also available on the project
-repository.
-
-\begin{tabular}{| l | l | l | l |}
-	\hline
-	 & MLP-Ranking ($k=1$) & MLP-Ranking ($k=2$) & Pattern Matching \\
-	\hline
-	Precision &  0.872  &  0.915  &  0.911  \\
-	Recall    &  0.839  &  0.892  &  0.733  \\
-	\hline
-\end{tabular}
-
-Note: $k$ equals the amount of the top ranked candidate definitions.
+As in lots of articles, the ones in the evaluation dataset contain identifiers
+whose description cannot be retrieved. This is due to two reasons. First and
+foremost, the identifier found in a formula is never mentioned in the
+surrounding text, and therefor, no description can be extracted. Second, the
+identifier is somehow ambigious (see section~\ref{ir}) and has been dropped. Most
+notably, identifiers like $I_{xx}$ will be discarded because of an ambigious
+index that contains multiple letters.
 
 
-% \paragraph{} We than took the pattern matching approach as a baseline for our ranked
-% retrievals sets as these patterns cover most common definition relations we
-% found so far.
+Unfortunately 32 out of 99 identifiers from our dataset fall into that category.
+We've decided to evaluate the performance of the remainder, as those 32 do not
+convey any conceptual flaws. From the users standpoint, the overall performance
+(in terms of recall) of such a system whould be rather annoying. As we are only
+interested in evaluating the performance of the \emph{MLP Ranking} algoritm itself,
+it is save to ignore those 32 identifers.
 
+\begin{table}[H]
+\vspace{-5pt}
+	\begin{center}
+		\begin{tabular}{| l | l | l | l |}
+			\hline
+			 & MLP-Ranking ($k=1$) & MLP-Ranking ($k=2$) & Pattern Matching \\
+			\hline
+			Precision &  0.872  &  0.915  &  0.911  \\
+			Recall    &  0.839  &  0.892  &  0.733  \\
+			\hline
+		\end{tabular}
+	\end{center}
+\caption{Evaluation results. Note: $k$ equals the amount of the top ranked candidate definitions.}
+\vspace{-20pt}
+\end{table}
+
+The results show that the unoptimized MLP approach keeps up with the
+performance of the simple pattern matcher. Furthermore, we observed that it is
+more robust in terms of recall, as it is less vulnerable to small changes in
+the sentence structure.
 
 
 \section{Further work}
@@ -354,15 +398,19 @@ impression is that this would not lead to significant performance gain.
 
 The distance measure $R_{\sigma_d}$ fails for the example of
 Fig.~\ref{fig:screenshot} since $\Delta(\mathsf{energy},E) =
-\Delta(\mathsf{mass},m) = 2$. Unfortunatly one cannot simply detect
+\Delta(\mathsf{mass},m) = 2$. Unfortunately, one cannot simply detect
 punctuation marks and introduce some kind of directed associativity (e.g.
-inflicting a penatly on the ranking if the relations spans over a comma). That
-would lead to whole classes of relation `types' (in terms of the grammatical
-structure) never being retrieved. We plan to mitigate this problem by taking
-more closely related scientific articles (based on their specific fields) into
-consideration and count the frequencies of the candidate relations. The
-intuition behind this is, that articles of the same scientific field will
-likely use the same definition for the identifiers.
+inflicting a penalty on the ranking if the candidate relations spans over a
+comma). That would lead to whole classes of relation `types' (in terms of the
+grammatical structure) never being retrieved. We plan to mitigate this problem
+by taking more closely related scientific articles (based on their specific
+fields) into consideration and count the frequencies of the candidate
+relations. The intuition behind this is, that articles of the same scientific
+field will likely use the same definition for the identifiers. Moreover,
+we hope to also mitigate the problem of `dangling' identifiers (those not
+mentioned in the article itself), as their may be description in related
+articles.
+
 
 Currently, we use the ranking $R$ to identify the most probable description-
 identifier tuple on each article, even if it occurs multiple times on the page.
@@ -371,6 +419,7 @@ combination of the identifier $E$ and the noun `energy'. A promising approach,
 is to use $R^\Sigma=\sum_{i=1}^n 2^{-i} R_i,$ where $R_i$ is a sorted list,
 were $R_1$ is the highest ranked definition for that relation according to the
 current measure $R$.
+
 
 Furthermore, a systematic approach for determining a wise choice of the
 ranking parameters should significantly improve the overall performance of our
