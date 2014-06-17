@@ -46,21 +46,9 @@ Einsteinufer 17, 10587 Berlin, Germany\\
 
 \begin{abstract}
 
-In natural language, words and phrases themselves imply the semantics. In
-contrast, the meaning of identifiers in mathematical formulae is undefined.
-Thus scientists must study the context to decode the meaning. The
-\emph{Mathematical Language Processing} project aims to support that process.
-In this paper, we compare two approaches to discover identifier - definition tuples.
-At first we use a simple pattern matching
-approach. Second, we present the \emph{MLP} approach that uses POS tag based
-distances as well as sentence positions to calculate identifier - definition
-probabilities.
-The evaluation of our prototypical system, applied on the
-Wikipedia text corpus, shows that our approach augments the user experience
-substantially. While hovering the identifiers in the formula, tool-tips with
-the most probable definitions occur. Tests with random samples show that the
-displayed definitions provide a good match with the actual meaning of the
-identifiers.
+In natural language, words and phrases themselves imply the semantics. In contrast, the meaning of identifiers in mathematical formulae is undefined.
+Thus scientists must study the context to decode the meaning. The \emph{Mathematical Language Processing} (MLP) project aims to support that process.  In this paper, we compare two approaches to discover identifier-definition tuples.  At first we use a simple pattern matching approach. Second, we present the \emph{MLP} approach that uses Part-of-speech (POS) tag based distances as well as sentence positions to calculate indentifier-definition probabilities. The evaluation of our prototypical system, applied on the Wikipedia text corpus, shows that our approach augments the user experience substantially. While hovering the identifiers in the formula, tool-tips with the most probable definitions occur. Tests with random samples show that the displayed definitions provide a good match with the actual meaning of the identifiers.
+
 
 \keywords{definition discovery, text mining, parallel computing}
 \end{abstract}
@@ -90,20 +78,24 @@ foundation for added value services such as search, clustering and improved
 accessibility.
 
 
-To build such a system, a labeled text corpus that annotates identifiers and
+To build such a system, a labelled text corpus that annotates identifiers and
 their definition is desirable. At the project start, such a corpus was not
-available. We use simple statistical assumptions about co-occurrences between
-identifiers and their potential description to extract the meaning of the
-identifiers from their context. In combination with the Stratosphere system
+available. 
+We assume that the probability to find correct identifier definition tuples is
+POS tagged based distance metrics.
+Our motivation for that is readers usually extract the identifier definition
+from the context that is given by the surrounding text.
+In combination with the Stratosphere system
 that is capable of scalable data processing,  we rapidly generate a large
 amount of definition relation candidates with only minimal implementation
-overhead to ensure the scalability of our algorithm.
+overhead for the parallelization.
 
 
 We chose the Wikipedia text corpus as a target because of two facts. First,
 most articles make use of \texttt{<math/>} tags (\emph{texvc} as an input
-language) for formulae. It is easy to detect and the extraction of identifiers
-is well tried. Second, the text is already annotated with mark-up.
+language) for formulae. Those tags are easy to detect and the extraction identifiers
+in its experimental MathML output format is well tried. 
+Second, the text is already annotated with mark-up.
 Particularly, hyperlinks to other articles within the Wikipedia are of
 interest as they typically wrap around any number of words and indicate that
 these in combination are relevant in the given context (respectively
@@ -129,7 +121,7 @@ natural language descriptions for mathematical expressions.
 \section{Pattern-based Definition Discovery}
 
 At first, we implemented a simple identifier definition extractor that is
-based on a set of static patterns. As it is an fairly robust approach und easy
+based on a set of static patterns. As it is an fairly robust approach and easy
 to implement, this will serve us as a good reference point in terms of
 performance. The following patterns are being used to discover description
 terms:
@@ -155,8 +147,9 @@ terms:
 \end{table}
 
 Note that in the last pattern we used a \emph{part-of-speech} tag. Actually
-determiners not only contain articles but also quatifiers and distributives.
+determiners not only contain articles but also quantifiers and distributives.
 To increase readability this list have been shortened to `*/DT'.
+\todo[inline]{describe the process: extraction of identifiers, how to didentify the dscription? Looking for space or using pos tags?}
 
 
 \section{Statistical Definition Discovery}
