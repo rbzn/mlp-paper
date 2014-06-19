@@ -46,9 +46,19 @@ Einsteinufer 17, 10587 Berlin, Germany\\
 
 \begin{abstract}
 
-In natural language, words and phrases themselves imply the semantics. In contrast, the meaning of identifiers in mathematical formulae is undefined.
-Thus scientists must study the context to decode the meaning. The Mathematical Language Processing (MLP) project aims to support that process.  In this paper, we compare two approaches to discover identifier-definition tuples.  At first we use a simple pattern matching approach. Second, we present the 
-MLP approach that uses part-of-speech  tag based distances as well as sentence positions to calculate identifier-definition probabilities. The evaluation of our prototypical system, applied on the Wikipedia text corpus, shows that our approach augments the user experience substantially. While hovering the identifiers in the formula, tool-tips with the most probable definitions occur. Tests with random samples show that the displayed definitions provide a good match with the actual meaning of the identifiers.
+In natural language, words and phrases themselves imply the semantics. In
+contrast, the meaning of identifiers in mathematical formulae is undefined.
+Thus scientists must study the context to decode the meaning. The Mathematical
+Language Processing (MLP) project aims to support that process. In this
+paper, we compare two approaches to discover identifier-definition tuples. At
+first we use a simple pattern matching approach. Second, we present the MLP
+approach that uses part-of-speech tag based distances as well as sentence
+positions to calculate identifier-definition probabilities. The evaluation of
+our prototypical system, applied on the Wikipedia text corpus, shows that our
+approach augments the user experience substantially. While hovering the
+identifiers in the formula, tool-tips with the most probable definitions
+occur. Tests with random samples show that the displayed definitions provide a
+good match with the actual meaning of the identifiers.
 
 
 \keywords{definition discovery, text mining, parallel computing}
@@ -74,27 +84,28 @@ reduce the reader's effort by displaying the most relevant definition relation
 found, to the reader. Students and scientists of other disciplines would
 especially profit from a system that helps them to understand formulae more
 quickly. In the long term, the extracted identifier definition tuples contribute
-to an increased machine readability of scientific publications. This builds a 
+to an increased machine readability of scientific publications. This builds a
 foundation for added value services such as search, clustering and improved
 accessibility.
 
 
 To build such a system, a labeled text corpus that annotates identifiers and
 their definition is desirable. At the project start, such a corpus was not
-available. 
-We assume that the probability to find correct identifier definition tuples is
-part-of-speech (POS) tagged based distance metrics.
-Our motivation for our choice is that readers usually extract identifier 
-definitions from context that is given by the surrounding text.
-In combination with the Stratosphere system \todo{[HSC: NEED REFERENCE]}
-that is capable of scalable data processing,  we rapidly generate a large
-amount of definition relation candidates with only minimal implementation
-overhead for the parallelization.
+available.
+We calculate the probablities for correct identifier definition tuples based
+on part-of-speech (POS) tagged based distance metrics.
+\todo{rewrite sentences to make it process more clear}
+ The motivation for our
+choice is that readers usually extract identifier definitions from context
+that is given by the surrounding text. In combination with the Stratosphere
+system \cite{Alexandrov2010} that is capable of scalable data processing, we
+rapidly generate a large amount of definition relation candidates with only
+minimal implementation overhead for the parallelization.
 
 
-We chose the Wikipedia text corpus as a target because of two facts. First,
+As the target text corpus we chose the Wikipedia because of two facts. First,
 most articles make use of \texttt{<math/>} tags (\emph{texvc} as an input
-language) for formulae.  The identification of these tags are easy to find, 
+language) for formulae. The identification of these tags are easy to find,
 and from the MathML output, it is easy to extract the identifiers.
 Second, the text is already annotated with mark-up.
 Particularly, hyperlinks to other articles within Wikipedia are of
@@ -123,8 +134,19 @@ natural language descriptions for mathematical expressions.
 At first, we implemented a simple identifier definition extractor that is
 based on a set of static patterns. As this is a fairly robust approach and easy
 to implement, it serves as a good reference point in terms of
-performance. The following patterns are being used to discover description
-terms: \todo{[HSC: here you should refer to the table]}
+performance. It simply iterates through the text, trying to find word groups,
+that are matched by a pattern. The patterns being used to discover description
+terms are depicted in table \ref{tpatterns}. Due to the fact that we already
+tokenized an annotated the articles in a previous step in the MLP system, we
+can make use of POS tags here as well.
+
+Note, determiners not only contain articles, but also quantifiers and
+distributives. The last pattern in table \ref{tpatterns} contains `*/DT'. This
+is a shorthand for every word, that has the POS tag `DT' (determiner), will be
+matched at this position. Otherwise this pattern whould be rather large, as it
+needs to contain every possible determiner. \emph{identifer} as well as
+\emph{description} are placholders, that mark the positions of the entities
+from a possible defintion relation.
 
 \begin{table}
 \vspace{-5pt}
@@ -142,15 +164,9 @@ terms: \todo{[HSC: here you should refer to the table]}
 			\hline
 		\end{tabular}
 	\end{center}
-\caption{Implemented static patterns}
+\caption{\label{tpatterns}Implemented static patterns}
 \vspace{-5pt}
 \end{table}
-
-Note that in the last pattern we used a POS tag.  Determiners not only contain 
-articles, but also quantifiers and distributives.
-To increase readability, this list have been shortened to `*/DT'. 
-\todo[inline]{[HSC: Explain */DT in detail.] describe the process: extraction of identifiers, 
-how to identify the description? Looking for space or using POS tags?}
 
 
 \section{Statistical Definition Discovery}
@@ -162,34 +178,34 @@ second we determine their description from the surrounding text.
 Extracting relevant identifiers from the article rely on the assumption that
 the author will use \texttt{<math/>} tags for all formulae. This said, a
 formula that is written within the text cannot be recognized, and therefore
-can never be extracted.
+can never be extracted by our system.
 
 The fact that we can estimate all relevant identifiers for an article (see
 Section \ref{ir}), combined with some common assumptions about the relation,
-can be exploited to largely reduce the set of candidates that need to be ranked.
-Please note that this reduction is essential for retrieving the correct
-relations. Otherwise almost any word would be ranked and the precision of the
-retrieval would drop significantly.
+can be exploited to largely reduce the set of candidates that need to be
+ranked. Please note that this reduction is essential for retrieving the
+correct relations for our approach. Otherwise almost any word would be ranked
+and the precision of the retrieval would drop significantly.
 
-\todo{HSC: The following two sentences need to be merged and explained further.
-Also, paragraphs need to have more than one sentence. Fix this.}
 The basic assumption of our approach is that the two entities of a definition
-relation co-occur in the same sentence.
+relation co-occur in the same sentence. In other words, if we want to retrieve
+the description for an identifier, in the set of sentences that contain the
+identifier the description should be found. Thus said, any other sentences can
+be ignored. Furthermore, we assume that it is more likely to find the
+description in first sentences than in the latter. This is based on the idea
+that authors introduce the meaning of an identifer and than subsequent use it,
+without necessarily repeating the meaning.
 
-The basic assumption of our approach is that if two entities take part in a
-relation, those two co-occur in the same sentence.
-Any other sentence is, therefor, irrelevant.
-
-Another assumption can be made about the lexical class
-of the description we want to rank. They are nouns or even noun phrases 
-(e.g.,
-\texttt{`the effective spring constant k'} or \texttt{`mass m of
-something'}). We discarded all other words (according to their POS tag)
-except noun phrases and Wikipedia hyperlinks.  These are candidates for a 
-definition.  This is important, due to the fact that overall
-ranking will be greatly influenced by the distance of candidate words. For all
-intents and purposes, it is not necessary to keep noun phrases as single words.
-They can therefore be aggregated and be ranked as if they were a single word.
+Another assumption can be made about the lexical class of the description we
+want to rank. They are nouns or even noun phrases (e.g., \texttt{`the
+effective spring constant k'} or \texttt{`mass m of something'}). We discard
+all other words (according to their POS tag) except noun phrases and Wikipedia
+hyperlinks. These are the candidates for a definition relation. Noun phrases
+and hyperlinks may consist of multiple words. For all intents and purposes, it
+is not necessary to threat noun phrases and hyperlinks as a set of words, and
+therefore, will be threated subsequently as if they were one. This is
+important, due to the fact that the overall ranking will be greatly influenced
+by the distance of candidates to the position of the identifer.
 
 
 \subsection{Numerical Statistics}
@@ -222,19 +238,19 @@ s=2\left({\ln 2}\right)^{-\frac{1}{2}}$.
 The classic tf-idf \cite{Salton86} statistic reflects the importance of a term
 to a document. For our task, the inverse document frequency (idf) assigns
 high penalties to frequent words like `length', as opposed to words seldom
-seen such as `Hamiltonian'. These are both valid definitions for identifiers. 
+seen such as `Hamiltonian'. These are both valid definitions for identifiers.
 As the influence of $\mathrm{tf}(t,s)$ on the sensitivity of the overall ranking
 (\ref{eq:rating}) seems to be very high, we reduce the impact with the tuning
-parameters $\gamma=0.1$ and $\alpha = \beta = 1$. Please note that the algorithm 
-currently only takes sentences into account which were found in a single article. 
-In the future, the retrieval process will examine sets of closely related articles.
-This will leverage the problem that distributional properties will be volatile on 
+parameters $\gamma=0.1$ and remain $\alpha = \beta = 1$. Please note that the algorithm
+currently only takes sentences into account which were found in a single article.
+In the future, the MLP system will examine sets of closely related articles.
+This will leverage the problem that distributional properties will be volatile on
 term universes with very few members (e.g., term frequencies in a single sentence).
 
 
 \paragraph{Implementation.}
 
-We implemented the MLP processing system \cite{github} as Stratosphere 
+We implemented the MLP processing system \cite{github} as Stratosphere
 data-flow using Java which allows for scalable execution, application of complex
 higher order functions, and easy integration of third party tools such as
 Stanford NLP and the Mylyn framework for mark-up parsing.
@@ -279,7 +295,7 @@ Stanford NLP and the Mylyn framework for mark-up parsing.
 
 Throughout our experiments, we made some observations that had an impact on the
 accuracy of retrieving the correct set of identifiers. First of all, people
-tend to incorrectly use \emph{texvc} when trying to create formulas. For example, 
+tend to incorrectly use \emph{texvc} when trying to create formulas. For example,
 \texttt{\textbackslash text\{log\}} is more often used than the correct
 operator \texttt{\textbackslash log}. Another problem is that sometimes people
 use indices as a form of `in field' annotation, like $T_{before}$ and
@@ -300,18 +316,17 @@ easily matched by our processor in the surrounding text if a formula contains
 one of those identifiers, and therefore, will also be blacklisted. Additionally,
 we blacklist common mathematical operators, constants, and functions.
 
-Because we do not have any annotated test corpora, evaluation has to be performed by hand. 
-Therefore, we took a sample of 30
-random articles and counted all matches. The resulting estimates for the
-identifier retrieval performance are: \emph{Recall: 0.99} and \emph{Precision:
-0.86}, which satisfy our information needs, as we are mostly interested in recall
-at this stage.
+Because we do not have any annotated test corpora, evaluation has to be
+performed by hand. Therefore, we took a sample of 30 random articles and
+counted all matches. The resulting estimates for the identifier retrieval
+performance are: \emph{Recall: 0.99} and \emph{Precision: 0.86}, which satisfy
+our information needs, as we are mostly interested in recall at this stage.
 
 
 \subsection{Description Retrieval}
 We ran our program on a dataset of about 20,000 articles, all containing
 \texttt{<math/>} tags, and retrieved about 550,000 candidate relations. The
-most common definition relations were:
+most common definition relations are listed in table \ref{tcommon}.
 
 
 \begin{table}[H]
@@ -330,7 +345,7 @@ most common definition relations were:
 		\hline
 	\end{tabular}
 	\end{center}
-\caption{Most common definition relations}
+\caption{\label{tcommon}Most common definition relations}
 \end{table}
 
 
@@ -338,15 +353,14 @@ most common definition relations were:
 example, in the fragment \texttt{`where $\phi$( $r_{i}$ ) is the electrostatic
 potential'}, the distance $\Delta(\phi, \mathsf{electrostatic\:potential} ) = 6$. This is due
 to counting brackets and function arguments as words. Also wrongly tagged
-words like `Hamiltonian' as an adjective leads to false negatives. Latter
-\todo{Latter ........ ???}
+words like `Hamiltonian' as an adjective leads to false negatives.
 
 
 \subsubsection{Comparative Evaluation}
 
-There is no gold standard evaluation datasets to measure the
-performance of identifier definition extractors. Thus created on on our own dataset.
-This is a very time consuming job. At the moment, the dataset only contains two
+There is no gold standard evaluation datasets to measure the performance of
+identifier definition extractors. Thus we created on on our own dataset. This
+is a very time consuming job. At the moment, the dataset only contains two
 large articles (revision ids are included) with around 100 identifier
 definitions. This dataset is also available on the project repository.
 
@@ -396,10 +410,11 @@ Our original intuition was to discover grammatical patterns like
 \emph{<description>}'} based on the statistical findings. However, our
 impression is that this would not lead to significant performance gain.
 
+
 The distance measure $R_{\sigma_d}$ fails for the example of
 Fig.~\ref{fig:screenshot} since $\Delta(\mathsf{energy},E) =
 \Delta(\mathsf{mass},m) = 2$. Unfortunately, one cannot simply detect
-punctuation marks and introduce some kind of directed associativity 
+punctuation marks and introduce some kind of directed associativity
 (e.g., inflicting a penalty on the ranking if the candidate relations spans over a
 comma). This leads to whole classes of relation `types' (in terms of the
 grammatical structure) never being retrieved. We plan to mitigate this problem
@@ -407,8 +422,8 @@ by taking more closely related scientific articles (based on their specific
 fields) into consideration and count the frequencies of the candidate
 relations. The intuition behind this is, that articles of the same scientific
 field will likely use the same definition for the identifiers. Moreover,
-we hope also to resolve the problem of `dangling' identifiers (those not
-mentioned in the article itself), as there may be a description in related
+we also hope to resolve the problem of `dangling' identifiers (those not
+mentioned in the article itself), as they might be described in related
 articles.
 
 
@@ -429,12 +444,11 @@ Our experiments showed that selecting candidates according to their POS tags
 combined with numerical statistics about the text surface, can lead to quality
 results. However, this approach is only applicable under certain conditions.
 For identifiers which are seldom seen, our statistical approach tends to fail.
-In that situation, other methods, especially supervised ones, are used to
-bootstrap a language model. Unfortunately, they require a labeled test corpus
-to measure the performance of a classifier that could be trained with our
-generated data. Currently, we are planning to use the NTCIR-Math-10 Task, Math
-Understanding Subtask gold standard dataset \cite{overview} for a comparable
-evaluation.
+In that situation, other methods, especially supervised ones, are preferred.
+Unfortunately, many of them require a labeled test corpus to measure the
+performance of a classifier that could be trained with our generated data.
+Currently, we are planning to use the NTCIR-Math-10 Task, Math Understanding
+Subtask gold standard dataset \cite{overview} for a comparable evaluation.
 
 During this project we had the impression that one could discover `namespaces'
 (sets of documents, that use the same definitions for identifier) to aid in
@@ -448,8 +462,6 @@ Thanks to Howard Cohl for proofreading the paper and to Holmer Hemsen, the
 course instructor of the database project course at TU-Berlin in Fall 2012.
 The implementation and a first draft of this paper was completed in the
 duration of this course.
-
-\todo{Fix two (?) dates in reference [3].}
 
 \begingroup
 \let\clearpage\relax
