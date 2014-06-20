@@ -15,7 +15,6 @@
 \usepackage{pgfplots}
 \usepackage{tikz}
 \usetikzlibrary{arrows,backgrounds,positioning}
-\usepackage{todonotes}
 
 \usepackage{url}
 \urldef{\mailsa}\path|rob@clabs.cc,schubotz@tu-berlin.de |
@@ -92,11 +91,13 @@ accessibility.
 To build such a system, a labeled text corpus that annotates identifiers and
 their definition is desirable. At the project start, such a corpus was not
 available.
-We calculate the probablities for correct identifier definition tuples based
+Consequently we had to start manual investigation of individual articles.
+Our first observation was many identifier definitions use a fixed string pattern
+to explain the definition to the reader. Furhtermore most
+definitions are usually very close to the occurence of the identifier.
+Thus we calculate the probablities for correct identifier definition tuples based
 on part-of-speech (POS) tagged based distance metrics.
-\todo{rewrite sentences to make it process more clear}
- The motivation for our
-choice is that readers usually extract identifier definitions from context
+This correlates to the experience that readers usually extract identifier definitions from context
 that is given by the surrounding text. In combination with the Stratosphere
 system \cite{Alexandrov2010} that is capable of scalable data processing, we
 rapidly generate a large amount of definition relation candidates with only
@@ -351,7 +352,8 @@ most common definition relations are listed in table \ref{tcommon}.
 
 \paragraph{Observations.} We observed some poorly ranked relations. For
 example, in the fragment \texttt{`where $\phi$( $r_{i}$ ) is the electrostatic
-potential'}, the distance $\Delta(\phi, \mathsf{electrostatic\:potential} ) = 6$. This is due
+potential'}, the distance is %\newline
+$\Delta(\phi, \mathsf{electrostatic\:potential} ) = 6$. This is due
 to counting brackets and function arguments as words. Also wrongly tagged
 words like `Hamiltonian' as an adjective leads to false negatives.
 
