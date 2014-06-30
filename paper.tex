@@ -80,7 +80,7 @@ unknown or at least ambiguous to the reader (depending on their knowledge).
 Therefore, one usually needs to study the surrounding text to find the
 relevant definition. An automatic information retrieval system can be used to
 reduce the reader's effort by displaying the most relevant definition relation
-found, to the reader. Students and scientists of other disciplines would
+found to the reader. Students and scientists of other disciplines would
 especially profit from a system that helps them to understand formulae more
 quickly. In the long term, the extracted identifier definition tuples contribute
 to an increased machine readability of scientific publications. This builds a
@@ -88,30 +88,26 @@ foundation for added value services such as search, clustering and improved
 accessibility.
 
 
-To build such a system, a labeled text corpus that annotates identifiers and
+To build such a system, a labelled text corpus that annotates identifiers and
 their definition is desirable. At the project start, such a corpus was not
-available.
-Consequently we had to start manual investigation of individual articles.
-Our first observation was many identifier definitions use a fixed string pattern
-to explain the definition to the reader. Furhtermore most
-definitions are usually very close to the occurence of the identifier.
-Thus we calculate the probablities for correct identifier definition tuples based
-on part-of-speech (POS) tagged based distance metrics.
-This correlates to the experience that readers usually extract identifier definitions from context
-that is given by the surrounding text. In combination with the Stratosphere
-system \cite{Alexandrov2010} that is capable of scalable data processing, we
-rapidly generate a large amount of definition relation candidates with only
-minimal implementation overhead for the parallelization.
+available. Consequently we had to start manual investigation of individual
+articles. Our first observation was that many identifier definitions use a
+fixed string pattern to explain the definition to the reader. Furthermore,
+most definitions usually appear very close to the related identifier in the
+sentences. Thus, we calculate the probabilities for correct identifier
+definition tuples based on distance metrics for certain part-of-speech (POS)
+tagged words. This correlates to the experience that readers usually extract
+identifier definitions from context that is given by the surrounding text.
 
 
-As the target text corpus we chose the Wikipedia because of two facts. First,
+We chose the Wikipedia as the target text corpus because of two facts. First,
 most articles make use of \texttt{<math/>} tags (\emph{texvc} as an input
-language) for formulae. The identification of these tags are easy to find,
-and from the MathML output, it is easy to extract the identifiers.
-Second, the text is already annotated with mark-up.
-Particularly, hyperlinks to other articles within Wikipedia are of
-interest as they typically wrap around any number of words and indicate that
-these in combination are relevant in the given context or (respectively) sentence.
+language) for formulae. The identification of \texttt{<math/>} tags is
+trivial, and from the MathML output, it is easy to extract the identifiers.
+Second, the articles are already annotated with mark-up. Particularly, hyperlinks
+to other articles within Wikipedia are of interest as they typically wrap
+around any number of words and indicate that these in combination are relevant
+in the given context or (respectively) sentence.
 
 
 The English Wikipedia contains roughly four million articles. Even if we only
@@ -119,9 +115,11 @@ pick articles containing \texttt{<math/>} tags, our processor still needs to
 compute with tens of thousands of articles. Especially when using text
 annotators (e.g., \emph{POS} tagger \cite{Rathna96}), like Stanford's NLP
 framework, one can make use of a parallel processing system to speed up
-computation. Therefore we implement the proposed strategy with the
-Stratosphere system based on the PACT programming model \cite{Alexandrov2010}.
-
+computation. We implement the proposed strategy with the Stratosphere system
+\cite{stratosphere}. It is based on the PACT programming model
+\cite{Alexandrov2010}, which enables us to rapidly generate a large amount of
+definition relation candidates with only minimal implementation overhead for
+the parallelization.
 
 \paragraph{Related Work.}
 
@@ -137,17 +135,17 @@ based on a set of static patterns. As this is a fairly robust approach and easy
 to implement, it serves as a good reference point in terms of
 performance. It simply iterates through the text, trying to find word groups,
 that are matched by a pattern. The patterns being used to discover description
-terms are depicted in table \ref{tpatterns}. Due to the fact that we already
-tokenized an annotated the articles in a previous step in the MLP system, we
+terms are depicted in Table \ref{tpatterns}. Due to the fact that we already
+tokenized and annotated the articles in a previous step in the MLP system, we
 can make use of POS tags here as well.
 
 Note, determiners not only contain articles, but also quantifiers and
-distributives. The last pattern in table \ref{tpatterns} contains `*/DT'. This
-is a shorthand for every word, that has the POS tag `DT' (determiner), will be
-matched at this position. Otherwise this pattern whould be rather large, as it
-needs to contain every possible determiner. \emph{identifer} as well as
-\emph{description} are placholders, that mark the positions of the entities
-from a possible defintion relation.
+distributives. The last pattern in Table \ref{tpatterns} contains `*/DT'. This
+is a shorthand for every word, that has the POS tag `DT' (determiner).
+Otherwise this pattern would be rather large, as it needs to contain every
+possible determiner. \emph{IDENTIFIER} as well as \emph{DESCRIPTION} are
+place-holder, that mark the positions of the entities from a possible definition
+relation.
 
 \begin{table}
 \vspace{-5pt}
@@ -176,13 +174,13 @@ We detect relations between identifiers and their description in two steps.
 First, we extract the identifiers from the formulae found in an article, and
 second we determine their description from the surrounding text.
 
-Extracting relevant identifiers from the article rely on the assumption that
+Extracting relevant identifiers from the article relies on the assumption that
 the author will use \texttt{<math/>} tags for all formulae. This said, a
-formula that is written within the text cannot be recognized, and therefore
-can never be extracted by our system.
+formula that is written in the running text cannot be recognized, and therefore,
+cannot be extracted by our system.
 
 The fact that we can estimate all relevant identifiers for an article (see
-Section \ref{ir}), combined with some common assumptions about the relation,
+Section \ref{ir}), combined with some common assumptions about definition relations,
 can be exploited to largely reduce the set of candidates that need to be
 ranked. Please note that this reduction is essential for retrieving the
 correct relations for our approach. Otherwise almost any word would be ranked
@@ -190,23 +188,23 @@ and the precision of the retrieval would drop significantly.
 
 The basic assumption of our approach is that the two entities of a definition
 relation co-occur in the same sentence. In other words, if we want to retrieve
-the description for an identifier, in the set of sentences that contain the
-identifier the description should be found. Thus said, any other sentences can
+the description for an identifier, only sentences containing the identifier
+could include the definition relation. Having said this, any other sentences can
 be ignored. Furthermore, we assume that it is more likely to find the
 description in first sentences than in the latter. This is based on the idea
-that authors introduce the meaning of an identifer and than subsequent use it,
-without necessarily repeating the meaning.
+that authors introduce the meaning of an identifier and than subsequent use the
+identifier, without necessarily repeating its definition.
 
-Another assumption can be made about the lexical class of the description we
-want to rank. They are nouns or even noun phrases (e.g., \texttt{`the
+Another assumption can be made about the lexical class of the definition relation we
+want to rank. The descriptions are nouns or even noun phrases (e.g., \texttt{`the
 effective spring constant k'} or \texttt{`mass m of something'}). We discard
 all other words (according to their POS tag) except noun phrases and Wikipedia
-hyperlinks. These are the candidates for a definition relation. Noun phrases
-and hyperlinks may consist of multiple words. For all intents and purposes, it
-is not necessary to threat noun phrases and hyperlinks as a set of words, and
-therefore, will be threated subsequently as if they were one. This is
+hyper-links. These are the candidates descriptions for a definition relation. Noun phrases
+and hyper-links may consist of multiple words. For all intents and purposes, it
+is not necessary to threat noun phrases and hyper-links as a set of words, and
+therefore, they will be treated subsequently as if they were one. This is
 important, due to the fact that the overall ranking will be greatly influenced
-by the distance of candidates to the position of the identifer.
+by the distance of candidates to the position of the identifier.
 
 
 \subsection{Numerical Statistics}
@@ -296,7 +294,7 @@ Stanford NLP and the Mylyn framework for mark-up parsing.
 
 Throughout our experiments, we made some observations that had an impact on the
 accuracy of retrieving the correct set of identifiers. First of all, people
-tend to incorrectly use \emph{texvc} when trying to create formulas. For example,
+tend to use \emph{texvc} only as a typesetting language and neglect its semantic capabilities. For example,
 \texttt{\textbackslash text\{log\}} is more often used than the correct
 operator \texttt{\textbackslash log}. Another problem is that sometimes people
 use indices as a form of `in field' annotation, like $T_{before}$ and
@@ -307,21 +305,20 @@ power or as a part of the identifier. Another ambiguity is that the
 multiplication sign can be omitted, so that it is undecidable for a naive
 program whether $ab^{2}$ contains one or two identifiers.
 
-We took a very conservative approach and preprocessed all formulas.
-The \TeX~command \texttt{\textbackslash text\{\}} blocks along with subscriptions containing
-more than a single character will be removed before analysis. Superscripts
-will also be ignored in terms of being a part of the identifier. Moreover, we
-created a comprehensive blacklist to improve the results further. Short words
-like `a', `A', and `I', which are very common in the English language, could be
-easily matched by our processor in the surrounding text if a formula contains
-one of those identifiers, and therefore, will also be blacklisted. Additionally,
-we blacklist common mathematical operators, constants, and functions.
+We took a very conservative approach and preprocessed all formulas. The
+\TeX~command \texttt{\textbackslash text\{\}} blocks along with subscriptions
+containing more than a single character will be removed before analysis.
+Superscripts will also be ignored in terms of being a part of the identifier.
+Moreover, we created a comprehensive blacklist to improve the results further.
+Identifier like `a', `A', and `I', which are also very common in the English
+language, could be easily matched by our processor in the surrounding text,
+and therefore, will also be blacklisted. Additionally, we blacklist common
+mathematical operators, constants, and functions.
 
-Because we do not have any annotated test corpora, evaluation has to be
-performed by hand. Therefore, we took a sample of 30 random articles and
-counted all matches. The resulting estimates for the identifier retrieval
-performance are: \emph{Recall: 0.99} and \emph{Precision: 0.86}, which satisfy
-our information needs, as we are mostly interested in recall at this stage.
+We took a sample of 30 random articles and counted all matches by hand. The
+resulting estimates for the identifier retrieval performance are
+\emph{Recall: 0.99} and \emph{Precision: 0.86}, which satisfy our information
+needs, as we are mostly interested in recall at this stage.
 
 
 \subsection{Description Retrieval}
@@ -360,11 +357,12 @@ words like `Hamiltonian' as an adjective leads to false negatives.
 
 \subsubsection{Comparative Evaluation}
 
-There is no gold standard evaluation datasets to measure the performance of
-identifier definition extractors. Thus we created on on our own dataset. This
-is a very time consuming job. At the moment, the dataset only contains two
-large articles (revision ids are included) with around 100 identifier
-definitions. This dataset is also available on the project repository.
+At the start of our project there were no gold standard datasets available to
+measure the performance of identifier definition extractors. Thus, we created
+one on our own. This is a very time consuming job. At the moment, the dataset
+only contains two large articles (revision ids are included) with around 100
+identifier definitions. This dataset is also available on the project
+repository.
 
 
 As in many articles, those in the evaluation dataset contain identifiers
@@ -447,7 +445,7 @@ combined with numerical statistics about the text surface, can lead to quality
 results. However, this approach is only applicable under certain conditions.
 For identifiers which are seldom seen, our statistical approach tends to fail.
 In that situation, other methods, especially supervised ones, are preferred.
-Unfortunately, many of them require a labeled test corpus to measure the
+Unfortunately, many of them require a labelled test corpus to measure the
 performance of a classifier that could be trained with our generated data.
 Currently, we are planning to use the NTCIR-Math-10 Task, Math Understanding
 Subtask gold standard dataset \cite{overview} for a comparable evaluation.
