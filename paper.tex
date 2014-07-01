@@ -463,10 +463,18 @@ course instructor of the database project course at TU-Berlin in Fall 2012.
 The implementation and a first draft of this paper was completed in the
 duration of this course.
 
-\begingroup
+
+\let\oldclearpage\clearpage
 \let\clearpage\relax
+\vspace{10 mm}
 \bibliography{mlp-papers}
-\endgroup
+\let\clearpage\oldclearpage
+
+
+% \let\standardclearpage\clearpage
+% \begingroup
+% \let\clearpage\relax
+% \endgroup
 
 \end{document}
 
