@@ -215,13 +215,12 @@ Each description candidate is ranked with the weighted sum
 \begin{equation} \label{eq:rating}
 R(n,\Delta,t,d)=\frac{\alpha{R}_{\sigma_\mathrm d}(\Delta)
 +\beta{R}_{\sigma_\mathrm s}(n)
-+\gamma\,\mathrm{tf}(t,s)}{\alpha+\beta+\gamma} \mapsto [0,1].
++\gamma\,\mathrm{tf}(t,d)}{\alpha+\beta+\gamma} \mapsto [0,1].
 \end{equation}
 
 The weighted sum depends on the distance $\Delta$ (amount of word tokens) between
-identifier and the description term $t$, the sentence number $n$ counting
-(from the beginning of the article) all sentences containing the identifier,
-and the term frequency $\mathrm{tf}(t,s)$ in the set of sentences $s$. The
+identifier and the description term $t$, the distance between formula and sentence $n$,
+and the term frequency $\mathrm{tf}(t,d)$. The
 distance was normalized with $R_\sigma(\Delta) = \exp\left[ -\frac{1}{2}
 \frac{\Delta^2-1}{\sigma^2}\right].$ We assume that the probability to find a
 relation at $\Delta=1$ is maximal. For example in the text fragment
@@ -239,7 +238,7 @@ The classic tf-idf \cite{Salton86} statistic reflects the importance of a term
 to a document. For our task, the inverse document frequency (idf) assigns
 high penalties to frequent words like `length', as opposed to words seldom
 seen such as `Hamiltonian'. These are both valid definitions for identifiers.
-As the influence of $\mathrm{tf}(t,s)$ on the sensitivity of the overall ranking
+As the influence of $\mathrm{tf}(t,d)$ on the sensitivity of the overall ranking
 (\ref{eq:rating}) seems to be very high, we reduce the impact with the tuning
 parameters $\gamma=0.1$ and remain $\alpha = \beta = 1$. Please note that the algorithm
 currently only takes sentences into account which were found in a single article.
@@ -282,7 +281,7 @@ Stanford NLP and the Mylyn framework for mark-up parsing.
 		\draw[arrow] (Sentence.east)--(Candidates.north);
 		\draw[arrow] (Candidates)--(Filter);
 		\draw[arrow] (Filter)--(Output);
-	\end{tikzpicture}
+		\end{tikzpicture}
 \caption{Data flow of the Stratosphere program}
 \end{figure}
 
